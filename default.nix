@@ -1,18 +1,27 @@
-{pkgs ? import <nixpkgs> {}}:
-pkgs.stdenv.mkDerivation {
+{
+  stdenv,
+  odin,
+  clang,
+  llvm_17,
+}:
+stdenv.mkDerivation (let
   name = "hello-world";
-  src = ./test;
+  src = ./src;
+in {
+  inherit name src;
 
-  buildInputs = with pkgs; [
-    ncurses
+  nativeBuildInputs = [
+    odin
+    clang
+    llvm_17
   ];
 
   buildPhase = ''
-    g++ hello-world.cpp -o hello-world -l ncurses
+    odin build ${src}/main -out:${name}
   '';
 
   installPhase = ''
     mkdir -p $out/bin
-    cp hello-world $out/bin
+    cp ${name} $out/bin
   '';
-}
+})

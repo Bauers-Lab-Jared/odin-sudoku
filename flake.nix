@@ -24,26 +24,9 @@
           pkgs = import nixpkgs {inherit system;};
         });
   in {
-    devShells = forEachSupportedSystem ({pkgs}: {
-      default = pkgs.mkShell {
-        # The Nix packages provided in the environment
-        # Add any you need here
-        packages = with pkgs; [
-          odin
-        ];
-
-        # Set any environment variables for your dev shell
-        env = {};
-
-        # Add any shell logic you want executed any time the environment is activated
-        shellHook = ''
-          echo "odin shell"
-        '';
-      };
-    });
     packages = forEachSupportedSystem ({pkgs}: {
       default =
-        (import ./default.nix {inherit pkgs;});
+        pkgs.callPackage ./default.nix {};
     });
   };
 }
