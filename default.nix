@@ -3,6 +3,7 @@
   odin,
   clang,
   llvm_17,
+  go-task,
 }:
 stdenv.mkDerivation (let
   name = "hello-world";
@@ -11,6 +12,7 @@ in {
   inherit name src;
 
   nativeBuildInputs = [
+    go-task
     odin
     clang
     llvm_17
