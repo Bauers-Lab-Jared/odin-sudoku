@@ -4,6 +4,7 @@
   clang,
   llvm_17,
   go-task,
+  qqwing,
 }:
 stdenv.mkDerivation (let
   name = "hello-world";
@@ -16,6 +17,7 @@ in {
     odin
     clang
     llvm_17
+    qqwing
   ];
 
   buildPhase = ''
