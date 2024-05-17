@@ -1,4 +1,10 @@
 version: '3'
 
+interval: 500ms
 tasks:
-  print: echo "tasks!"
+  test:
+    watch: true
+    sources:
+      - 'src/**/*.odin'
+    cmds: 
+      - odin test src/main
