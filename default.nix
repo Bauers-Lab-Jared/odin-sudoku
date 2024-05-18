@@ -21,7 +21,7 @@ in {
   ];
 
   buildPhase = ''
-    odin build ${src}/sudoku -out:${name}
+    odin build ${src}/main -out:${name}
   '';
 
   installPhase = ''
