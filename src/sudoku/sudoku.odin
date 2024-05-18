@@ -5,7 +5,6 @@ import "core:os"
 import "core:strings"
 
 main :: proc() {
-	readSudokuFile("test-files/test-puzzles01.csv")
 }
 
 sudokuPuzzle :: struct {
@@ -41,14 +40,6 @@ readSudokuFile :: proc(path: string) -> (puzzleSet: [dynamic]sudokuPuzzle, err: 
 		}
 		append(&filePuzzles, puzzle)
 	}
-	fmt.println("Puzzles:\n")
 
-	for s in filePuzzles {
-		fmt.println(s.cells)
-	}
-
-	fmt.println("\n-------------------")
-
-	fmt.printf("Number of Puzzles = %v\n", len(filePuzzles))
 	return filePuzzles, err
 }

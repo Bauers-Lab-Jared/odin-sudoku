@@ -7,10 +7,10 @@ tasks:
     sources:
       - 'src/**/*.odin'
     cmds: 
-      - odin test src/main
+      - odin test src/sudoku
   test-run:
     watch: true
     sources:
       - 'src/**/*.odin'
     cmds: 
-      - odin run src/main
+      - odin run src/sudoku
