@@ -8,3 +8,9 @@ tasks:
       - 'src/**/*.odin'
     cmds: 
       - odin test src/main
+  test-run:
+    watch: true
+    sources:
+      - 'src/**/*.odin'
+    cmds: 
+      - odin run src/main

@@ -7,7 +7,7 @@
   qqwing,
 }:
 stdenv.mkDerivation (let
-  name = "hello-world";
+  name = "odin-sudoku";
   src = ./src;
 in {
   inherit name src;
