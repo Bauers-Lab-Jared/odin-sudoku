@@ -7,4 +7,5 @@ Format_Error :: enum {
 }
 
 FormatPuzzle :: proc(p: SudokuPuzzle) -> (puzzleString: string, err: Format_Error) {
+	return "", Format_Error.None
 }

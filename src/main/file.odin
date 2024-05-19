@@ -43,9 +43,9 @@ parseSudoku_line :: proc(inputLine: string) -> (out: SudokuPuzzle, err: ParseErr
 	for c, i in inputLine {
 		switch c {
 		case '.':
-			puzzle.cells[i] = CellValues{1, 2, 3, 4, 5, 6, 7, 8, 9}
+			puzzle[i] = CellValues{1, 2, 3, 4, 5, 6, 7, 8, 9}
 		case '1' ..= '9':
-			puzzle.cells[i] = cast(u8)c - '0'
+			puzzle[i] = cast(u8)c - '0'
 		case:
 			return puzzle, ParseError.UnexpectedChar
 		}

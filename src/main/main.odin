@@ -13,19 +13,18 @@ Cell :: union {
 	u8,
 }
 
-CellGroup :: [9]^Cells
+SudokuPuzzle :: [81]Cell
 
-GenerateCellGroups :: proc(
-	$cells: [81]Cell,
-) -> (
+CellGroup :: [9]^Cell
+
+SudokuWorkspace :: struct {
+	targetSudoku:     ^SudokuPuzzle,
 	rows, cols, sqrs: [9]CellGroup,
-	grps: [27]CellGroup,
-) {
+	grps:             [27]CellGroup,
 }
 
-SudokuPuzzle :: struct {
-	cells: [81]Cell,
-	rows:  [9]CellGroup,
-	cols:  [9]CellGroup,
-	grps:  [9]CellGroup,
+CreatRow :: proc(targ: ^SudokuPuzzle) -> (rows: [9]CellGroup) {
+	for i in 0 ..< 9 {
+		rows[i] = targ[(0 + (i * 9)):(8 + (i * 9))]
+	}
 }
