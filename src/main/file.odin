@@ -9,7 +9,7 @@ fileRead_Error :: union {
 	bool,
 }
 
-readSudokuFile :: proc(path: string) -> (puzzleSet: [dynamic]SudokuPuzzle, err: fileRead_Error) {
+read_sudoku_file :: proc(path: string) -> (puzzleSet: [dynamic]SudokuPuzzle, err: fileRead_Error) {
 	data := os.read_entire_file(path, context.allocator) or_return
 	defer delete(data, context.allocator)
 
@@ -33,19 +33,17 @@ ParseError :: enum {
 }
 
 parseSudoku_line :: proc(inputLine: string) -> (out: SudokuPuzzle, err: ParseError) {
-	puzzle: [81]Cell
-
 	if len(inputLine) < 81 do return {}, ParseError.StringTooShort
 
 	for c, i in inputLine {
 		switch c {
 		case '.':
-			puzzle[i].possible = 511 //1..=9 possible
+			out[i / 9][i % 9].possible = 511 //1..=9 possible
 		case '1' ..= '9':
-			puzzle[i].value = cast(u8)c - '0'
+			out[i / 9][i % 9].value = cast(u8)c - '0'
 		case:
-			return transmute(SudokuPuzzle)puzzle, ParseError.UnexpectedChar
+			return out, ParseError.UnexpectedChar
 		}
 	}
-	return transmute(SudokuPuzzle)puzzle, ParseError.None
+	return out, ParseError.None
 }

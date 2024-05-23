@@ -3,7 +3,7 @@ package sudoku
 import "core:fmt"
 
 main :: proc() {
-	puzzles, err := readSudokuFile("test-files/test-puzzles01")
+    return
 }
 
 Cell :: bit_field u16 {
