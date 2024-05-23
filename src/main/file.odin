@@ -19,7 +19,7 @@ read_sudoku_file :: proc(path: string) -> (puzzleSet: [dynamic]SudokuPuzzle, err
 	for line in strings.split_lines_iterator(&it) {
 		if len(line) < 81 do continue
 
-		p, err := parseSudoku_line(line[0:81])
+		p, err := parse_sudoku_line(line[0:81])
 		if err == ParseError.None do append(&filePuzzles, p)
 	}
 
@@ -32,7 +32,7 @@ ParseError :: enum {
 	StringTooShort,
 }
 
-parseSudoku_line :: proc(inputLine: string) -> (out: SudokuPuzzle, err: ParseError) {
+parse_sudoku_line :: proc(inputLine: string) -> (out: SudokuPuzzle, err: ParseError) {
 	if len(inputLine) < 81 do return {}, ParseError.StringTooShort
 
 	for c, i in inputLine {
