@@ -1,16 +1,30 @@
-version: '3'
-
+version: "3"
 interval: 500ms
 tasks:
+  create-dirs:
+    internal: true
+    cmds:
+      - mkdir -p build/bin
   test:
+    cmds:
+      - task: create-dirs
+      - odin test src/main -error-pos-style:unix
+  build:
+    cmds:
+      - task: create-dirs
+      - odin build src/main -out:build/bin/main
+  run:
+    cmds:
+      - task: create-dirs
+      - odin run src/main -out:build/bin/main
+  watch:
     watch: true
     sources:
-      - 'src/**/*.odin'
-    cmds: 
-      - odin test src/main
-  test-run:
-    watch: true
+      - "src/**/*.odin"
+    cmds:
+      - task: test
+  watch-run:
     sources:
-      - 'src/**/*.odin'
-    cmds: 
-      - odin run src/main
+      - "src/**/*.odin"
+    cmds:
+      - task: run
