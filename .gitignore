@@ -1,6 +1,6 @@
 result
-.nvim
 .user
+.nvim/*
 .task/*
 .ccls-cache
 .direnv/*
