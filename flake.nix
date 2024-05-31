@@ -19,8 +19,12 @@
       devShells.default = pkgs.mkShell {
         inherit (appliedOverlay.default) nativeBuildInputs buildInputs;
 
-        packages = [(self.inputs.nixvim.lib.mkNixvim {inherit pkgs; addons =
-        [ "proj-odin" "proj-nix" ];})];
+        packages = [
+          (self.inputs.nixvim.lib.mkNixvim {
+            inherit pkgs;
+            addons = ["proj-odin" "proj-nix"];
+          })
+        ];
       };
     };
   in
