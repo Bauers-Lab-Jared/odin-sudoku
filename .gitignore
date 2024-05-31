@@ -1,7 +1,6 @@
 result
 .user
-.nvim/*
-.task/*
+.nvim/
+.task/
 .ccls-cache
-.direnv/*
-.direnv/flake-profile
+.direnv/
