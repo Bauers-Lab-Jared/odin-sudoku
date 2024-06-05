@@ -5,6 +5,7 @@
   llvm_17,
   go-task,
   qqwing,
+  gdb,
 }:
 stdenv.mkDerivation (let
   name = "odin-sudoku";
@@ -13,6 +14,7 @@ in {
   inherit name src;
 
   nativeBuildInputs = [
+    gdb
     go-task
     odin
     clang
