@@ -63,6 +63,7 @@ tasks:
     cmds:
       - odin test src/main -out:test/main
     aliases:
+      - test
       - t
     generates:
       - test/main
