@@ -49,36 +49,21 @@ test_read_sudoku_file :: proc(t: ^testing.T) {
 		if ln > 30 do return
 		p := puzzles[ln]
 		for c, i in line {
-			expected1: u8
-			expected2: CellPossibilities
+			expected: Cell
 			switch c {
 			case '.':
-				expected1 = 0
-				expected2 = CellPossibilities{1, 2, 3, 4, 5, 6, 7, 8, 9}
+				expected = CellPossibilities{1, 2, 3, 4, 5, 6, 7, 8, 9}
 			case '1' ..= '9':
-				expected1 = cast(u8)c - '0'
-				expected2 = CellPossibilities{}
+				expected = cast(u8)c - '0'
 			case:
 				fmt.panicf("dummyFile had unexpected character at %v:%v, '%v'", ln, i, c)
 			}
-			actual1 := p[i / 9][i % 9].value
-			actual2 := transmute(CellPossibilities)p[i / 9][i % 9].possible
+			actual := p[i / 9][i % 9]
 
 			testing.expect(
 				t,
-				expected1 == actual1,
-				fmt.tprintf("dummyFile %v:%v, expected %v, got %v", ln, i, expected1, actual1),
-			)
-			testing.expect(
-				t,
-				expected2 == actual2,
-				fmt.tprintf(
-					"dummyFile %v:%v, expected cell possibilities %v, got %v",
-					ln,
-					i,
-					expected2,
-					actual2,
-				),
+				expected == actual,
+				fmt.tprintf("dummyFile %v:%v, expected %v, got %v", ln, i, expected, actual),
 			)
 			ln += 1
 		}

@@ -45,12 +45,19 @@ format_puzzle_str :: proc(p: SudokuPuzzle) -> (puzzleString: string, err: Puzzle
 				read := reader_read_byte(&reader) or_return
 
 				if read == '.' {
-					switch p[r][c].value {
-					case 1 ..= 9:
-						buf: [4]byte
-						write_string(&builder, strconv.itoa(buf[:], cast(int)(0 + p[r][c].value)))
-						done = true
-					case:
+
+					switch v in p[r][c] {
+					case u8:
+						switch v {
+						case 1 ..= 9:
+							buf: [4]byte
+							write_string(&builder, strconv.itoa(buf[:], cast(int)(0 + v)))
+							done = true
+						case:
+							write_byte(&builder, read)
+							done = true
+						}
+					case CellPossibilities:
 						write_byte(&builder, read)
 						done = true
 					}

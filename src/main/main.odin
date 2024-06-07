@@ -8,12 +8,9 @@ main :: proc() {
 	return
 }
 
-Cell :: bit_field u16 {
-	value:     u8   | 4, //Contains solved cell value or 0 if unsolved
-	possible:  u16  | 9, //Contains the yet possible solution values
-	reserved1: bool | 1,
-	reserved2: bool | 1,
-	reserved3: bool | 1,
+Cell :: union {
+	u8,
+	CellPossibilities,
 }
 
 CellPossibilities :: bit_set[1 ..= 9]
