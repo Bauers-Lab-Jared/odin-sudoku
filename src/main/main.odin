@@ -3,8 +3,8 @@ package sudoku
 import "core:fmt"
 
 main :: proc() {
-	puzzles, err := read_sudoku_file("./test-files/test-puzzles01")
-	for puz in puzzles {fmt.print(format_puzzle_str(puz))}
+	//puzzles, err := read_sudoku_file("./test-files/test-puzzles01")
+	//for puz in puzzles {fmt.print(format_puzzle_str(puz))}
 	return
 }
 
@@ -105,44 +105,6 @@ Address_All :: proc(indexGrp: u16, indexCell: u16) -> (x: u16, y: u16, ok: bool)
 	}
 }
 
-// CellGroup :: [9]^Cell
-// 
-// _Group_Set :: proc(puzzle: ^SudokuPuzzle) -> (grps: [9]CellGroup)
-// _Group_All_Sets :: proc(puzzle: ^SudokuPuzzle) -> (rows, cols, sqrs: [9]CellGroup)
-// 
-// Get_Rows :: proc(puzzle: ^SudokuPuzzle) -> (grps: [9]CellGroup) {
-//     rows:= &puzzle^[9]
-//     return rows
-// }
-// 
-// Get_Cols :: proc(puzzle: ^SudokuPuzzle) -> (grps: [9]CellGroup) {
-//     cols: [9]CellGroup
-//     for r in 0..<9 {
-//         for c in 0..<9 {
-//            cols[c][r] = &puzzle^[r][c]
-//         }
-//     }
-// }
-// 
-// Cell_Grouper :: union {
-//     _Group_Set,
-//     _Group_All_Sets,
-// }
-
 LogicResult :: struct {
 	changedCells: bool,
 }
-
-// _Proc_On_Set :: proc(grps: [9]CellGroup) -> (res: LogicResult)
-// _Proc_On_All_Sets :: proc(rows, cols, sqrs: [9]CellGroup) -> (res: LogicResult)
-// 
-// Proc_On_Groups :: union {
-//     _Proc_On_Set,
-//     _Proc_On_All_Sets,
-// }
-// 
-// SudokuWorkspace :: struct {
-// 	targetSudoku:     ^SudokuPuzzle,
-// 	rows, cols, sqrs: [9]CellGroup,
-// 	grps:             [27]CellGroup,
-// }

@@ -65,7 +65,7 @@ Test_Address_Cols :: proc(t: ^testing.T) {
 
 @(test)
 Test_Address_Sqrs :: proc(t: ^testing.T) {
-	lut: [9][9][2]u16 =  {
+	lut: [9][9][2]u16 = {
 		{{0, 0}, {0, 1}, {0, 2}, {1, 0}, {1, 1}, {1, 2}, {2, 0}, {2, 1}, {2, 2}},
 		{{0, 3}, {0, 4}, {0, 5}, {1, 3}, {1, 4}, {1, 5}, {2, 3}, {2, 4}, {2, 5}},
 		{{0, 6}, {0, 7}, {0, 8}, {1, 6}, {1, 7}, {1, 8}, {2, 6}, {2, 7}, {2, 8}},
@@ -107,7 +107,7 @@ Test_Address_Sqrs :: proc(t: ^testing.T) {
 
 @(test)
 Test_Address_All :: proc(t: ^testing.T) {
-	lut: [9][9][2]u16 =  {
+	lut: [9][9][2]u16 = {
 		{{0, 0}, {0, 1}, {0, 2}, {1, 0}, {1, 1}, {1, 2}, {2, 0}, {2, 1}, {2, 2}},
 		{{0, 3}, {0, 4}, {0, 5}, {1, 3}, {1, 4}, {1, 5}, {2, 3}, {2, 4}, {2, 5}},
 		{{0, 6}, {0, 7}, {0, 8}, {1, 6}, {1, 7}, {1, 8}, {2, 6}, {2, 7}, {2, 8}},
@@ -178,4 +178,30 @@ Test_Address_All :: proc(t: ^testing.T) {
 			)
 		}
 	}
+}
+
+@(test)
+Test_Check_Solved_Cells :: proc(t: ^testing.T = {}) {
+	testPuzzle: SudokuPuzzle
+
+	shifty: u16
+	for row, r in testPuzzle {
+		if r > 0 do shifty += transmute(u16)CellPossibilities{r}
+		for cell, i in row {
+			testPuzzle[r][i].possible = shifty << cast(u16)i
+			fmt.printf("[%v][%v]", r, i)
+			for p in transmute(CellPossibilities)testPuzzle[r][i].possible {
+				fmt.printf(", %v", p)
+			}
+			fmt.println("")
+		}
+	}
+
+	Check_Solved_Cells(&testPuzzle)
+
+	for i in 0 ..< 9 {
+		testPuzzle[0][i] = Cell{}
+	}
+
+	return
 }
