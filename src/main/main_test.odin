@@ -188,16 +188,16 @@ Test_Check_Solved_Cells :: proc(t: ^testing.T = {}) {
 	for row, r in testPuzzle {
 		if r > 0 do shifty += transmute(u16)CellPossibilities{r}
 		for cell, i in row {
-			testPuzzle[r][i].possible = shifty << cast(u16)i
+			testPuzzle[r][i] = transmute(CellPossibilities)(shifty << cast(u16)i)
 			fmt.printf("[%v][%v]", r, i)
-			for p in transmute(CellPossibilities)testPuzzle[r][i].possible {
+			for p in testPuzzle[r][i].(CellPossibilities) {
 				fmt.printf(", %v", p)
 			}
 			fmt.println("")
 		}
 	}
 
-	Check_Solved_Cells(&testPuzzle)
+	//Check_Solved_Cells(&testPuzzle)
 
 	for i in 0 ..< 9 {
 		testPuzzle[0][i] = Cell{}

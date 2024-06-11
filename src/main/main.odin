@@ -9,7 +9,7 @@ main :: proc() {
 }
 
 Cell :: union {
-	u8,
+	u16,
 	CellPossibilities,
 }
 

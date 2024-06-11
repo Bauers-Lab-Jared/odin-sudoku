@@ -54,7 +54,7 @@ test_read_sudoku_file :: proc(t: ^testing.T) {
 			case '.':
 				expected = CellPossibilities{1, 2, 3, 4, 5, 6, 7, 8, 9}
 			case '1' ..= '9':
-				expected = cast(u8)c - '0'
+				expected = cast(u16)c - '0'
 			case:
 				fmt.panicf("dummyFile had unexpected character at %v:%v, '%v'", ln, i, c)
 			}

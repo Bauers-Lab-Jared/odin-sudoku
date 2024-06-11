@@ -40,7 +40,7 @@ parse_sudoku_line :: proc(inputLine: string) -> (out: SudokuPuzzle, err: ParseEr
 		case '.':
 			out[i / 9][i % 9] = CellPossibilities{1, 2, 3, 4, 5, 6, 7, 8, 9}
 		case '1' ..= '9':
-			out[i / 9][i % 9] = cast(u8)c - '0'
+			out[i / 9][i % 9] = cast(u16)c - '0'
 		case:
 			return out, ParseError.UnexpectedChar
 		}

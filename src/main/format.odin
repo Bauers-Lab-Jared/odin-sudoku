@@ -47,7 +47,7 @@ format_puzzle_str :: proc(p: SudokuPuzzle) -> (puzzleString: string, err: Puzzle
 				if read == '.' {
 
 					switch v in p[r][c] {
-					case u8:
+					case u16:
 						switch v {
 						case 1 ..= 9:
 							buf: [4]byte
