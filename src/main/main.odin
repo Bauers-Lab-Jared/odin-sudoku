@@ -3,8 +3,8 @@ package sudoku
 import "core:fmt"
 
 main :: proc() {
-	//puzzles, err := read_sudoku_file("./test-files/test-puzzles01")
-	//for puz in puzzles {fmt.print(format_puzzle_str(puz))}
+	puzzles, err := read_sudoku_file("./test-files/test-puzzles01")
+	for puz in puzzles {fmt.print(format_puzzle_str(puz))}
 	return
 }
 
