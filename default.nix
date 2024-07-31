@@ -7,11 +7,10 @@
   qqwing,
   gdb,
 }:
-stdenv.mkDerivation (let
-  name = "odin-sudoku";
+stdenv.mkDerivation rec {
+  pname = "odin-sudoku";
+  version = "0.1";
   src = ./src;
-in {
-  inherit name src;
 
   nativeBuildInputs = [
     gdb
@@ -23,11 +22,12 @@ in {
   ];
 
   buildPhase = ''
-    odin build ${src}/main -out:${name}
+    odin build ./main/ \
+    -out:${pname}
   '';
 
   installPhase = ''
     mkdir -p $out/bin
-    cp ${name} $out/bin
+    cp ${pname} $out/bin
   '';
-})
+}
