@@ -62,9 +62,6 @@ tasks:
       - "src/**/*.odin"
     cmds:
       - odin test src/main -out:test/main
-    aliases:
-      - test
-      - t
     generates:
       - test/main
   mkdir-debug:
@@ -96,3 +93,9 @@ tasks:
       - "src/**/*.odin"
     cmds:
       - task: run
+  repl:
+    cmds:
+      - odin run test/repl.odin -file
+  test:
+    cmds:
+      - odin test src/sudoku/puzzle
