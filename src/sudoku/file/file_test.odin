@@ -1,4 +1,4 @@
-package sudoku
+package file
 
 import "core:fmt"
 import "core:strings"

@@ -1,5 +1,6 @@
-package sudoku
+package file
 
+import "../puzzle"
 import "core:fmt"
 import "core:os"
 import "core:strings"
