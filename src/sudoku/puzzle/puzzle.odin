@@ -93,23 +93,18 @@ Map_Over_Puzzle :: proc {
 	Map_Over_Puzzle_By_Group,
 }
 
-//Check_Solved_Cells :: proc(puzzle: ^SudokuPuzzle) -> (result: LogicResult) {
-//	info: LogicInfo
-//	for &row, x in puzzle {
-//		for &cell, y in row {
-//			c, isSet := cell.(CellPossibilities)
-//			if isSet && card(c) == 1 {
-//				for i in 1 ..= 9 {
-//					if i in c {
-//						cell = u16(i)
-//						info.changedCells = true
-//					}
-//				}
-//			} else if cell == {} {
-//				info.cellsWithNoSolution = true
-//			}
-//		}
-//	}
-//
-//	return info
-//}
+Check_Solved_Cells :: proc(puzzle: ^SudokuPuzzle) -> (result: GroupsEvalResult) {
+	result = Map_Over_Puzzle(puzzle, proc(c: ^Cell) -> CellEvalResult {
+		cellResult: CellEvalResult
+		cell, isSet := c^.(CellPossibilities)
+		if isSet && card(cell) == 1 {
+			for i in 1 ..= 9 {
+				if i in cell {
+					cellResult = u16(i)
+				}
+			}
+		}
+		return cellResult
+	}).(GroupsEvalResult)
+	return result
+}
