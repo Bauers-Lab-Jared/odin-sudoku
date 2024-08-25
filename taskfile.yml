@@ -95,7 +95,7 @@ tasks:
       - task: run
   repl:
     cmds:
-      - odin run test/repl.odin -file
+      - odin run test/repl.odin -file -out:bin/temp
   test:
     cmds:
-      - odin test src/sudoku/puzzle
+      - odin test src/sudoku/file -out:bin/temp
