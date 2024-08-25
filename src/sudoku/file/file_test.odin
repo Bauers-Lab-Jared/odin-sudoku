@@ -1,11 +1,13 @@
 package file
 
+import "../puzzle"
 import "core:fmt"
 import "core:strings"
 import "core:testing"
 
 @(test)
 test_read_sudoku_file :: proc(t: ^testing.T) {
+  using puzzle
 	dummyFile := `
 ...6928......74..1..5.8.......4.1...6...5.2.....7...6......6..52.4...61.59.....4.
 6...7..8.2.43.8........17....9..28.3.4.7..9....8..617.....4..9........3..1..2....
@@ -41,13 +43,12 @@ test_read_sudoku_file :: proc(t: ^testing.T) {
 
 
 	puzzles, err := read_sudoku_file("test-files/test-puzzles01")
-	testing.expect(t, err == nil, fmt.tprintf("Expected nil error, got %v", err))
+	testing.expect(t, err == nil, fmt.tprintf("Expected no error (nil), got %v", err))
 
 	ln := 0
 	for line in strings.split_lines_iterator(&dummyFile) {
 		if len(line) < 81 do continue
 		if ln > 30 do return
-		p := puzzles[ln]
 		for c, i in line {
 			expected: Cell
 			switch c {
@@ -56,16 +57,16 @@ test_read_sudoku_file :: proc(t: ^testing.T) {
 			case '1' ..= '9':
 				expected = cast(u16)c - '0'
 			case:
-				fmt.panicf("dummyFile had unexpected character at %v:%v, '%v'", ln, i, c)
+				fmt.panicf("dummyFile had unexpected character at %v:%v, '%v'", ln+1, i+1, c)
 			}
-			actual := p[i / 9][i % 9]
+			actual := puzzles[ln].data[i / 9][i % 9]
 
 			testing.expect(
 				t,
 				expected == actual,
-				fmt.tprintf("dummyFile %v:%v, expected %v, got %v", ln, i, expected, actual),
+				fmt.tprintf("dummyFile %v:%v, expected %v, got %v", ln+1, i+1, expected, actual),
 			)
-			ln += 1
 		}
+			ln += 1
 	}
 }
