@@ -17,10 +17,15 @@ SudokuPuzzle :: struct {
 
 CellEvalResult :: Cell
 GroupEvalResult :: [9]CellEvalResult
-PuzzleEvalResult :: struct {
+GroupsEvalResult :: [9]GroupEvalResult
+AllGroupsEvalResult :: struct {
 	rows: [9]GroupEvalResult,
 	cols: [9]GroupEvalResult,
 	sqrs: [9]GroupEvalResult,
+}
+PuzzleEvalResult :: union {
+	GroupsEvalResult,
+	AllGroupsEvalResult,
 }
 
 Puzzle_Init :: proc(puzzle: ^SudokuPuzzle) {
@@ -70,15 +75,13 @@ Map_Over_Groups :: proc {
 }
 
 Map_Over_Puzzle_By_Cell :: proc(puzzle: ^SudokuPuzzle, f: CellEval) -> PuzzleEvalResult {
-	result: PuzzleEvalResult
-	result.rows = Map_Over_Groups(&puzzle.rows, f)
-	result.cols = Map_Over_Groups(&puzzle.cols, f)
-	result.sqrs = Map_Over_Groups(&puzzle.sqrs, f)
+	result: GroupsEvalResult
+	result = Map_Over_Groups(&puzzle.rows, f)
 	return result
 }
 
 Map_Over_Puzzle_By_Group :: proc(puzzle: ^SudokuPuzzle, f: GroupEval) -> PuzzleEvalResult {
-	result: PuzzleEvalResult
+	result: AllGroupsEvalResult
 	result.rows = Map_Over_Groups(&puzzle.rows, f)
 	result.cols = Map_Over_Groups(&puzzle.cols, f)
 	result.sqrs = Map_Over_Groups(&puzzle.sqrs, f)
