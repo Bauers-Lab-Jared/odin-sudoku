@@ -1,4 +1,4 @@
-package puzzle
+package SudokuSolver
 
 Cell :: union {
 	u16,

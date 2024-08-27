@@ -1,6 +1,5 @@
-package file
+package SudokuSolver
 
-import "../puzzle"
 import "core:fmt"
 import "core:os"
 import "core:strings"
@@ -14,10 +13,9 @@ read_sudoku_file :: proc(
 	path: string,
 	allocator := context.allocator,
 ) -> (
-	puzzleSet: [dynamic]puzzle.SudokuPuzzle,
+	puzzleSet: [dynamic]SudokuPuzzle,
 	err: fileRead_Error,
 ) {
-	using puzzle
 	data := os.read_entire_file(path, allocator) or_return
 
 	filePuzzles := make([dynamic]SudokuPuzzle, 0, 100)
@@ -39,8 +37,7 @@ ParseError :: enum {
 	StringTooShort,
 }
 
-parse_sudoku_line :: proc(inputLine: string) -> (out: puzzle.SudokuPuzzle, err: ParseError) {
-	using puzzle
+parse_sudoku_line :: proc(inputLine: string) -> (out: SudokuPuzzle, err: ParseError) {
 	if len(inputLine) < 81 do return {}, ParseError.StringTooShort
 
 	for c, i in inputLine {

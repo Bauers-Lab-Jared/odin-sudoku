@@ -1,10 +1,13 @@
 package puzzle
 
+import src "../../src/main"
 import "core:fmt"
 import "core:testing"
 
 @(test)
 Test_Puzzle_Init :: proc(t: ^testing.T) {
+	using src
+
 	testPuzzle: SudokuPuzzle
 	Puzzle_Init(&testPuzzle)
 	i: u16
@@ -59,6 +62,8 @@ Test_Puzzle_Init :: proc(t: ^testing.T) {
 
 @(test)
 Test_Map_Functions :: proc(t: ^testing.T = {}) {
+	using src
+
 	testPuzzle: SudokuPuzzle
 	Puzzle_Init(&testPuzzle)
 
@@ -114,6 +119,7 @@ Test_Map_Functions :: proc(t: ^testing.T = {}) {
 
 @(test)
 Test_Check_Solved_Cells :: proc(t: ^testing.T = {}) {
+	using src
 	testPuzzle: SudokuPuzzle
 	Puzzle_Init(&testPuzzle)
 	lut: [9][9]Cell

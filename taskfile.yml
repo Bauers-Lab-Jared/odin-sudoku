@@ -25,8 +25,6 @@ tasks:
       - d
     method: none
   debug-dap:
-    deps:
-      - build-debug
     cmds:
       - gdb debug/main -i dap
     method: none
@@ -48,22 +46,16 @@ tasks:
       - b
     generates:
       - bin/main
-  mkdir-test:
-    precondition: "[ ! -e test ]"
-    sources:
-      - "test/"
-    cmds:
-      - mkdir test
-    internal: true
   build-test:
     deps:
-      - mkdir-test
+      - mkdir-debug
     sources:
       - "src/**/*.odin"
     cmds:
-      - odin test src/main -out:test/main
-    generates:
-      - test/main
+      - odin test test/ -out:debug/main -o:none -debug -all-packages
+    aliases:
+      - test
+    method: none
   mkdir-debug:
     precondition: "[ ! -e debug ]"
     sources:
@@ -93,9 +85,3 @@ tasks:
       - "src/**/*.odin"
     cmds:
       - task: run
-  repl:
-    cmds:
-      - odin run test/repl.odin -file -out:bin/temp
-  test:
-    cmds:
-      - odin test src/sudoku/file -out:bin/temp

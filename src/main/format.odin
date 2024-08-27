@@ -1,13 +1,11 @@
-package format
+package SudokuSolver
 
-import "../puzzle"
 import "core:fmt"
 import "core:io"
 import "core:strconv"
 import "core:strings"
 
-format_puzzle_str :: proc(puzzle: ^puzzle.SudokuPuzzle) -> string {
-	using puzzle
+format_puzzle_str :: proc(puzzle: ^SudokuPuzzle) -> string {
 
 	puzzleStringTemplate := `
      . . . | . . . | . . . 
