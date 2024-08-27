@@ -10,10 +10,15 @@ fileRead_Error :: union {
 	bool,
 }
 
-read_sudoku_file :: proc(path: string) -> (puzzleSet: [dynamic]puzzle.SudokuPuzzle, err: fileRead_Error) {
-  using puzzle
-	data := os.read_entire_file(path, context.allocator) or_return
-	defer delete(data, context.allocator)
+read_sudoku_file :: proc(
+	path: string,
+	allocator := context.allocator,
+) -> (
+	puzzleSet: [dynamic]puzzle.SudokuPuzzle,
+	err: fileRead_Error,
+) {
+	using puzzle
+	data := os.read_entire_file(path, allocator) or_return
 
 	filePuzzles := make([dynamic]SudokuPuzzle, 0, 100)
 
@@ -35,7 +40,7 @@ ParseError :: enum {
 }
 
 parse_sudoku_line :: proc(inputLine: string) -> (out: puzzle.SudokuPuzzle, err: ParseError) {
-  using puzzle
+	using puzzle
 	if len(inputLine) < 81 do return {}, ParseError.StringTooShort
 
 	for c, i in inputLine {
