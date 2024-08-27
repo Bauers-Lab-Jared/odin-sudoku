@@ -1,79 +1,53 @@
-package sudoku
+package format
 
+import "../puzzle"
 import "core:fmt"
 import "core:io"
 import "core:strconv"
 import "core:strings"
 
-Format_Error :: enum {
-	None,
-}
-
-Puzzle_Format_Error :: union {
-	Format_Error,
-	io.Error,
-}
-
-format_puzzle_str :: proc(p: SudokuPuzzle) -> (puzzleString: string, err: Puzzle_Format_Error) {
-	using strings
+format_puzzle_str :: proc(puzzle: ^puzzle.SudokuPuzzle) -> string {
+	using puzzle
 
 	puzzleStringTemplate := `
-     . . . | . . . | . . .
-     . . . | . . . | . . .
-     . . . | . . . | . . .
+     . . . | . . . | . . . 
+     . . . | . . . | . . . 
+     . . . | . . . | . . . 
     -------|-------|-------
-     . . . | . . . | . . .
-     . . . | . . . | . . .
-     . . . | . . . | . . .
+     . . . | . . . | . . . 
+     . . . | . . . | . . . 
+     . . . | . . . | . . . 
     -------|-------|-------
-     . . . | . . . | . . .
-     . . . | . . . | . . .
-     . . . | . . . | . . .
-    `
+     . . . | . . . | . . . 
+     . . . | . . . | . . . 
+     . . . | . . . | . . . 
+`
 
-	reader: Reader
-	reader_init(&reader, puzzleStringTemplate)
-	assert(reader_length(&reader) >= 81, "Puzzle template length too short")
+	builder := strings.builder_make(0, len(puzzleStringTemplate))
+	defer strings.builder_destroy(&builder)
 
-	builder: Builder
-	builder_init_len(&builder, len(puzzleStringTemplate))
-
-	for r in 0 ..< 9 {
-		for c in 0 ..< 9 {
-			done := false
-			for !done {
-				read := reader_read_byte(&reader) or_return
-
-				if read == '.' {
-
-					switch v in p[r][c] {
-					case u16:
-						switch v {
-						case 1 ..= 9:
-							buf: [4]byte
-							write_string(&builder, strconv.itoa(buf[:], cast(int)(0 + v)))
-							done = true
-						case:
-							write_byte(&builder, read)
-							done = true
-						}
-					case CellPossibilities:
-						write_byte(&builder, read)
-						done = true
+	cellIndex: int
+	for char in puzzleStringTemplate {
+		if char == '.' {
+			cell, cell_solved := puzzle^.data[cellIndex / 9][cellIndex % 9].(u16)
+			if cellIndex < 81 {
+				if cell_solved {
+					if cell >= 1 && cell <= 9 {
+						strings.write_int(&builder, cast(int)cell)
+					} else {
+						strings.write_byte(&builder, '!')
 					}
 				} else {
-					write_byte(&builder, read)
+					strings.write_byte(&builder, cast(u8)char)
 				}
+				cellIndex += 1
+			} else {
+				strings.write_byte(&builder, '?')
 			}
+		} else {
+			strings.write_byte(&builder, cast(u8)char)
 		}
 	}
-
-	for {
-		read, e := reader_read_byte(&reader)
-		if e == io.Error.EOF do break
-		write_byte(&builder, read)
-	}
-
-	puzzleString = to_string(builder)
-	return puzzleString, Format_Error.None
+	res := strings.clone(strings.to_string(builder))
+	return res
 }
