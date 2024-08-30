@@ -3,7 +3,7 @@ interval: 500ms
 tasks:
   default:
     cmds:
-      - task: build-test
+      - task: env-reload
   env-reload:
     cmds:
       - direnv reload
