@@ -93,15 +93,9 @@ format_puzzle_str_full :: proc(
 		switch rowIndex {
 		case 0:
 		case 3, 6:
-			strings.write_string(
-				&builder,
-				"\n" + emptyLine + "\n" + outerHoriLine + "\n" + emptyLine + "\n",
-			)
+			strings.write_string(&builder, "\n" + outerHoriLine + "\n")
 		case:
-			strings.write_string(
-				&builder,
-				"\n" + emptyLine + "\n" + innerHoriLine + "\n" + emptyLine + "\n",
-			)
+			strings.write_string(&builder, "\n" + innerHoriLine + "\n")
 		}
 
 		for &buf in subrows {
@@ -115,9 +109,9 @@ format_puzzle_str_full :: proc(
 				case 0:
 					prefix = emptySpace
 				case 3, 6:
-					prefix = emptySpace + outerVert + emptySpace
+					prefix = outerVert + emptySpace
 				case:
-					prefix = emptySpace + innerVert + emptySpace
+					prefix = innerVert + emptySpace
 				}
 				strings.write_string(&subrow, prefix)
 				switch c in cell {
@@ -139,6 +133,14 @@ format_puzzle_str_full :: proc(
 						} else {
 							strings.write_string(&subrow, ruledOut + emptySpace)
 						}
+					}
+				case nil:
+					for i in 1 ..= 3 {
+						strings.write_string(&subrow, "?" + emptySpace)
+					}
+				case:
+					for i in 1 ..= 3 {
+						strings.write_string(&subrow, "!" + emptySpace)
 					}
 				}
 			}
