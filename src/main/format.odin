@@ -89,7 +89,7 @@ format_puzzle_str_full :: proc(
 		buf = strings.builder_make(0, lineLength, allocator) or_return
 	}
 
-	for &row, rowIndex in puzzle^.rows {
+	for &row, rowIndex in puzzle^.data {
 		switch rowIndex {
 		case 0:
 		case 3, 6:
