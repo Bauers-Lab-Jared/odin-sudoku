@@ -38,7 +38,8 @@ ParseError :: enum {
 }
 
 parse_sudoku_line :: proc(inputLine: string) -> (out: SudokuPuzzle, err: ParseError) {
-	if len(inputLine) < 81 do return {}, ParseError.StringTooShort
+	Puzzle_Init(&out)
+	if len(inputLine) < 81 do return out, ParseError.StringTooShort
 
 	for c, i in inputLine {
 		switch c {
@@ -47,6 +48,7 @@ parse_sudoku_line :: proc(inputLine: string) -> (out: SudokuPuzzle, err: ParseEr
 		case '1' ..= '9':
 			out.data[i / 9][i % 9] = cast(u16)c - '0'
 		case:
+			Puzzle_Init(&out)
 			return out, ParseError.UnexpectedChar
 		}
 	}
