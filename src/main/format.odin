@@ -2,10 +2,11 @@ package SudokuSolver
 
 import "core:fmt"
 import "core:io"
+import "core:runtime"
 import "core:strconv"
 import "core:strings"
 
-format_puzzle_str :: proc(puzzle: ^SudokuPuzzle) -> string {
+format_puzzle_str :: proc(puzzle: ^SudokuPuzzle, allocator := context.allocator) -> string {
 
 	puzzleStringTemplate := `
      . . . | . . . | . . . 
@@ -21,8 +22,7 @@ format_puzzle_str :: proc(puzzle: ^SudokuPuzzle) -> string {
      . . . | . . . | . . . 
 `
 
-	builder := strings.builder_make(0, len(puzzleStringTemplate))
-	defer strings.builder_destroy(&builder)
+	builder := strings.builder_make(0, len(puzzleStringTemplate), allocator)
 
 	cellIndex: int
 	for char in puzzleStringTemplate {
@@ -46,6 +46,110 @@ format_puzzle_str :: proc(puzzle: ^SudokuPuzzle) -> string {
 			strings.write_byte(&builder, cast(u8)char)
 		}
 	}
-	res := strings.clone(strings.to_string(builder))
-	return res
+
+	return strings.to_string(builder)
+}
+
+format_puzzle_str_full :: proc(
+	puzzle: ^SudokuPuzzle,
+	allocator := context.allocator,
+) -> (
+	res: strings.Builder,
+	err: runtime.Allocator_Error,
+) {
+
+	emptySpace :: " "
+	ruledOut :: "."
+	innerVert :: "│"
+	innerHor :: "─"
+	innerInt :: "┼"
+	outerVert :: "║"
+	outerHor :: "═"
+	outerInt :: "╬"
+	lineLength :: 71
+	emptyP :: emptySpace + emptySpace
+	innerHoriP :: innerHor + innerHor
+	outerHoriP :: outerHor + outerHor
+	emptyC :: emptyP + emptyP + emptyP + emptySpace
+	innerHoriC :: innerHoriP + innerHoriP + innerHoriP + innerHor
+	outerHoriC :: outerHoriP + outerHoriP + outerHoriP + outerHor
+	emptyG :: emptyC + innerVert + emptyC + innerVert + emptyC
+	innerHoriG :: innerHoriC + innerInt + innerHoriC + innerInt + innerHoriC
+	outerHoriG :: outerHoriC + outerHor + outerHoriC + outerHor + outerHoriC
+	emptyLine :: emptyG + outerVert + emptyG + outerVert + emptyG
+	innerHoriLine :: innerHoriG + outerVert + innerHoriG + outerVert + innerHoriG
+	outerHoriLine :: outerHoriG + outerInt + outerHoriG + outerInt + outerHoriG
+
+	builder := strings.builder_make(0, 5120, allocator) or_return
+	subrows: [3]strings.Builder
+	defer for &buf in subrows {
+		strings.builder_destroy(&buf)
+	}
+	for &buf in subrows {
+		buf = strings.builder_make(0, lineLength, allocator) or_return
+	}
+
+	for &row, rowIndex in puzzle^.rows {
+		switch rowIndex {
+		case 0:
+		case 3, 6:
+			strings.write_string(
+				&builder,
+				"\n" + emptyLine + "\n" + outerHoriLine + "\n" + emptyLine + "\n",
+			)
+		case:
+			strings.write_string(
+				&builder,
+				"\n" + emptyLine + "\n" + innerHoriLine + "\n" + emptyLine + "\n",
+			)
+		}
+
+		for &buf in subrows {
+			strings.builder_reset(&buf)
+		}
+
+		for cell, cellIndex in row {
+			for &subrow, srIndex in subrows {
+				prefix: string
+				switch cellIndex {
+				case 0:
+					prefix = emptySpace
+				case 3, 6:
+					prefix = emptySpace + outerVert + emptySpace
+				case:
+					prefix = emptySpace + innerVert + emptySpace
+				}
+				strings.write_string(&subrow, prefix)
+				switch c in cell {
+				case u16:
+					strings.write_string(&subrow, ruledOut + emptySpace)
+					if srIndex == 1 {
+						strings.write_byte(&subrow, u8('0' + c))
+						strings.write_string(&subrow, emptySpace)
+					} else {
+						strings.write_string(&subrow, ruledOut + emptySpace)
+					}
+					strings.write_string(&subrow, ruledOut + emptySpace)
+				case CellPossibilities:
+					for i in 1 ..= 3 {
+						cellPossibility := i + srIndex * 3
+						if cellPossibility in c {
+							strings.write_byte(&subrow, u8('0' + cellPossibility))
+							strings.write_string(&subrow, emptySpace)
+						} else {
+							strings.write_string(&subrow, ruledOut + emptySpace)
+						}
+					}
+				}
+			}
+		}
+
+		strings.write_string(&builder, strings.to_string(subrows[0]))
+		strings.write_string(&builder, "\n")
+		strings.write_string(&builder, strings.to_string(subrows[1]))
+		strings.write_string(&builder, "\n")
+		strings.write_string(&builder, strings.to_string(subrows[2]))
+	}
+
+	return builder, nil
 }

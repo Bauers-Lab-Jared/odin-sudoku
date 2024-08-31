@@ -33,3 +33,16 @@ test_format_puzzle_str :: proc(t: ^testing.T) {
 		fmt.tprintf("Expected:\n%v\nGot:\n%v", printDef, pString),
 	)
 }
+
+@(test)
+test_format_puzzle_str_full :: proc(t: ^testing.T) {
+	using src
+	using strings
+	puzzleDef := `...6928......74..1..5.8.......4.1...6...5.2.....7...6......6..52.4...61.59.....4.`
+
+	puzzle, _ := parse_sudoku_line(puzzleDef)
+	builder, _ := format_puzzle_str_full(&puzzle)
+	defer strings.builder_destroy(&builder)
+
+	fmt.print(strings.to_string(builder))
+}
