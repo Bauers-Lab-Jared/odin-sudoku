@@ -9,7 +9,7 @@ Test_Puzzle_Init :: proc(t: ^testing.T) {
 	using src
 
 	testPuzzle: SudokuPuzzle
-	Puzzle_Init(&testPuzzle)
+	puzzle_init(&testPuzzle)
 	i: u16
 	for row in 0 ..= 8 {
 		for col in 0 ..= 8 {
@@ -65,14 +65,14 @@ Test_Map_Functions :: proc(t: ^testing.T = {}) {
 	using src
 
 	testPuzzle: SudokuPuzzle
-	Puzzle_Init(&testPuzzle)
+	puzzle_init(&testPuzzle)
 
-	test1 := Map_Over_Puzzle(&testPuzzle, proc(c: ^Cell) -> CellEvalResult {
+	test1 := map_over_puzzle(&testPuzzle, proc(c: ^Cell) -> CellEvalResult {
 		result := c^.(CellPossibilities) - CellPossibilities{1}
 		return result
 	})
 
-	test2 := Map_Over_Puzzle(&testPuzzle, proc(g: ^CellGroup) -> GroupEvalResult {
+	test2 := map_over_puzzle(&testPuzzle, proc(g: ^CellGroup) -> GroupEvalResult {
 		result: GroupEvalResult
 		for &c, i in g {
 			result[i] = c^.(CellPossibilities) - CellPossibilities{2}
@@ -121,7 +121,7 @@ Test_Map_Functions :: proc(t: ^testing.T = {}) {
 Test_Check_Solved_Cells :: proc(t: ^testing.T = {}) {
 	using src
 	testPuzzle: SudokuPuzzle
-	Puzzle_Init(&testPuzzle)
+	puzzle_init(&testPuzzle)
 	lut: [9][9]Cell
 
 	testPuzzle.data[0] = {{}, {}, {}, {}, {}, {}, {}, {}, {}}
@@ -224,7 +224,7 @@ Test_Check_Solved_Cells :: proc(t: ^testing.T = {}) {
 	lut[7] = {nil, nil, nil, nil, nil, nil, nil, nil, 9}
 	lut[8] = {nil, nil, nil, nil, nil, nil, nil, nil, 9}
 
-	result := Check_Solved_Cells(&testPuzzle)
+	result := check_solved_cells(&testPuzzle)
 
 	for x in 0 ..< 9 {
 		for y in 0 ..< 9 {

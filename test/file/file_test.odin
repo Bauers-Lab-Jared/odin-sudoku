@@ -8,6 +8,7 @@ import "core:testing"
 @(test)
 test_read_sudoku_file :: proc(t: ^testing.T) {
 	using src
+	testFile :: "test-files/test-puzzles01"
 	dummyFile := `
 ...6928......74..1..5.8.......4.1...6...5.2.....7...6......6..52.4...61.59.....4.
 6...7..8.2.43.8........17....9..28.3.4.7..9....8..617.....4..9........3..1..2....
@@ -41,9 +42,35 @@ test_read_sudoku_file :: proc(t: ^testing.T) {
 ..94....1.6..95...2....7.95...2.............47.1..9...6......1.4.5.2.....1.8.42.7
     `
 
+	pBuff, allocErr := puzzle_buffer_make()
+	defer delete(pBuff)
 
-	puzzles, err := read_sudoku_file("test-files/test-puzzles01")
-	testing.expect(t, err == nil, fmt.tprintf("Expected no error (nil), got %v", err))
+	testing.expect(
+		t,
+		allocErr == nil,
+		fmt.tprintf("Expected no error (nil) on puzzle_buffer_make(), got %v", allocErr),
+	)
+
+	nPuzzles, nLines, err := read_sudoku_file(testFile, &pBuff)
+	testing.expect(
+		t,
+		err == nil,
+		fmt.tprintf("Expected no error (nil) on read_sudoku_file(), got %v", err),
+	)
+	testing.expect(
+		t,
+		nLines == 100,
+		fmt.tprintf("Expected number of lines read from '%v' to be 100, got %v", testFile, nLines),
+	)
+	testing.expect(
+		t,
+		nPuzzles == 100,
+		fmt.tprintf(
+			"Expected number of puzzles parsed from '%v' to be 100, got %v",
+			testFile,
+			nPuzzles,
+		),
+	)
 
 	ln := 0
 	for line in strings.split_lines_iterator(&dummyFile) {
@@ -59,7 +86,7 @@ test_read_sudoku_file :: proc(t: ^testing.T) {
 			case:
 				fmt.panicf("dummyFile had unexpected character at %v:%v, '%v'", ln + 1, i + 1, c)
 			}
-			actual := puzzles[ln].data[i / 9][i % 9]
+			actual := pBuff[ln].data[i / 9][i % 9]
 
 			testing.expect(
 				t,

@@ -1,35 +1,39 @@
 package SudokuSolver
 
+import "base:runtime"
 import "core:fmt"
 import "core:os"
 import "core:strings"
 
-fileRead_Error :: union {
+SudokuRead_Error :: union {
 	os.Errno,
+	runtime.Allocator_Error,
 	bool,
 }
 
 read_sudoku_file :: proc(
 	path: string,
+	puzzleBuffer: ^[dynamic]SudokuPuzzle,
 	allocator := context.allocator,
 ) -> (
-	puzzleSet: [dynamic]SudokuPuzzle,
-	err: fileRead_Error,
+	nPuzzles: int,
+	nLines: int,
+	err: SudokuRead_Error,
 ) {
 	data := os.read_entire_file(path, allocator) or_return
+	defer delete(data)
+	puzzle: SudokuPuzzle
 
-	filePuzzles := make([dynamic]SudokuPuzzle, 0, 100)
-
-	it := string(data)
-	for line in strings.split_lines_iterator(&it) {
+	iter := string(data)
+	iter_loop: for line in strings.split_lines_iterator(&iter) {
+		nLines += 1
 		if len(line) < 81 do continue
 
-		puzzle: SudokuPuzzle
-		err := parse_sudoku_line(&puzzle, line[0:81])
-		if err == ParseError.None do append(&filePuzzles, puzzle)
+		parse_sudoku_line(&puzzle, line[0:81]) or_continue
+		puzzle_buffer_append(puzzleBuffer, &puzzle, allocator) or_return
+		nPuzzles += 1
 	}
-
-	return filePuzzles, err
+	return nPuzzles, nLines, err
 }
 
 ParseError :: enum {
@@ -39,7 +43,7 @@ ParseError :: enum {
 }
 
 parse_sudoku_line :: proc(puzzle: ^SudokuPuzzle, inputLine: string) -> (err: ParseError) {
-	Puzzle_Init(puzzle)
+	puzzle_init(puzzle)
 	if len(inputLine) < 81 do return ParseError.StringTooShort
 
 	for c, i in inputLine {
@@ -49,7 +53,7 @@ parse_sudoku_line :: proc(puzzle: ^SudokuPuzzle, inputLine: string) -> (err: Par
 		case '1' ..= '9':
 			puzzle.data[i / 9][i % 9] = cast(u16)c - '0'
 		case:
-			Puzzle_Init(puzzle)
+			puzzle_init(puzzle)
 			return ParseError.UnexpectedChar
 		}
 	}

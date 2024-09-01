@@ -7,10 +7,11 @@ import "core:strings"
 main :: proc() {
 	printBuilder := strings.builder_make(0, 8192, context.allocator)
 	defer strings.builder_destroy(&printBuilder)
+	puzzles, _ := puzzle_buffer_make()
+	defer delete(puzzles)
 
 	fmt.println("Sudoku Solver")
-	puzzles, _ := read_sudoku_file("./test-files/test-puzzles01")
-	defer delete(puzzles)
+	nPuzzles, nLines, _ := read_sudoku_file("./test-files/test-puzzles01", &puzzles)
 
 
 	//	for &puz in puzzles {
