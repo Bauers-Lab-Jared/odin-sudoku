@@ -49,16 +49,16 @@ SudokuPuzzle :: struct {
 
 CellEvalResult :: Cell
 GroupEvalResult :: [9]CellEvalResult
-GroupsEvalResult :: [9]GroupEvalResult
-AllGroupsEvalResult :: struct {
+GroupSetEvalResult :: [9]GroupEvalResult
+AllGroupSetsEvalResult :: struct {
 	rows: [9]GroupEvalResult,
 	cols: [9]GroupEvalResult,
 	sqrs: [9]GroupEvalResult,
 }
 
 PuzzleEvalResult :: union {
-	GroupsEvalResult,
-	AllGroupsEvalResult,
+	GroupSetEvalResult,
+	AllGroupSetsEvalResult,
 }
 
 puzzle_buffer_make :: proc(
@@ -107,38 +107,38 @@ map_over_group :: proc(group: ^CellGroup, f: CellEval) -> GroupEvalResult {
 	return result
 }
 
-map_over_groups_by_cell :: proc(groups: ^[9]CellGroup, f: CellEval) -> [9]GroupEvalResult {
+map_over_groupSet_by_cell :: proc(groupSet: ^[9]CellGroup, f: CellEval) -> [9]GroupEvalResult {
 	result: [9]GroupEvalResult
-	for &group, i in groups {
+	for &group, i in groupSet {
 		result[i] = map_over_group(&group, f)
 	}
 	return result
 }
 
-map_over_groups_by_group :: proc(groups: ^[9]CellGroup, f: GroupEval) -> [9]GroupEvalResult {
+map_over_groupSet_by_group :: proc(groupSet: ^[9]CellGroup, f: GroupEval) -> [9]GroupEvalResult {
 	result: [9]GroupEvalResult
-	for &group, i in groups {
+	for &group, i in groupSet {
 		result[i] = f(&group)
 	}
 	return result
 }
 
-map_over_groups :: proc {
-	map_over_groups_by_cell,
-	map_over_groups_by_group,
+map_over_groupSet :: proc {
+	map_over_groupSet_by_cell,
+	map_over_groupSet_by_group,
 }
 
 map_over_puzzle_by_cell :: proc(puzzle: ^SudokuPuzzle, f: CellEval) -> PuzzleEvalResult {
-	result: GroupsEvalResult
-	result = map_over_groups(&puzzle.rows, f)
+	result: GroupSetEvalResult
+	result = map_over_groupSet(&puzzle.rows, f)
 	return result
 }
 
 map_over_puzzle_by_group :: proc(puzzle: ^SudokuPuzzle, f: GroupEval) -> PuzzleEvalResult {
-	result: AllGroupsEvalResult
-	result.rows = map_over_groups(&puzzle.rows, f)
-	result.cols = map_over_groups(&puzzle.cols, f)
-	result.sqrs = map_over_groups(&puzzle.sqrs, f)
+	result: AllGroupSetsEvalResult
+	result.rows = map_over_groupSet(&puzzle.rows, f)
+	result.cols = map_over_groupSet(&puzzle.cols, f)
+	result.sqrs = map_over_groupSet(&puzzle.sqrs, f)
 	return result
 }
 
@@ -147,7 +147,7 @@ map_over_puzzle :: proc {
 	map_over_puzzle_by_group,
 }
 
-check_solved_cells :: proc(puzzle: ^SudokuPuzzle) -> (result: GroupsEvalResult) {
+check_solved_cells :: proc(puzzle: ^SudokuPuzzle) -> (result: GroupSetEvalResult) {
 	result = map_over_puzzle(puzzle, proc(c: ^Cell) -> CellEvalResult {
 		cellResult: CellEvalResult
 		cell, isSet := c^.(CellPossibilities)
@@ -159,6 +159,6 @@ check_solved_cells :: proc(puzzle: ^SudokuPuzzle) -> (result: GroupsEvalResult) 
 			}
 		}
 		return cellResult
-	}).(GroupsEvalResult)
+	}).(GroupSetEvalResult)
 	return result
 }

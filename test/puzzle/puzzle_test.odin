@@ -83,35 +83,35 @@ Test_Map_Functions :: proc(t: ^testing.T = {}) {
 	for i in 0 ..= 8 {
 		testing.expectf(
 			t,
-			test1.(GroupsEvalResult)[i] == CellPossibilities{2, 3, 4, 5, 6, 7, 8, 9},
+			test1.(GroupSetEvalResult)[i] == CellPossibilities{2, 3, 4, 5, 6, 7, 8, 9},
 			`Map_Over_Puzzle_By_Cell result[%v] = %v; Expected %v`,
 			i,
-			test1.(GroupsEvalResult)[i],
+			test1.(GroupSetEvalResult)[i],
 			CellPossibilities{2, 3, 4, 5, 6, 7, 8, 9},
 		)
 
 		testing.expectf(
 			t,
-			test2.(AllGroupsEvalResult).rows[i] == CellPossibilities{1, 3, 4, 5, 6, 7, 8, 9},
+			test2.(AllGroupSetsEvalResult).rows[i] == CellPossibilities{1, 3, 4, 5, 6, 7, 8, 9},
 			`Map_Over_Puzzle_By_Group result.rows[%v] = %v; Expected %v`,
 			i,
-			test2.(AllGroupsEvalResult).rows[i],
+			test2.(AllGroupSetsEvalResult).rows[i],
 			CellPossibilities{1, 3, 4, 5, 6, 7, 8, 9},
 		)
 		testing.expectf(
 			t,
-			test2.(AllGroupsEvalResult).cols[i] == CellPossibilities{1, 3, 4, 5, 6, 7, 8, 9},
+			test2.(AllGroupSetsEvalResult).cols[i] == CellPossibilities{1, 3, 4, 5, 6, 7, 8, 9},
 			`Map_Over_Puzzle_By_Group result.cols[%v] = %v; Expected %v`,
 			i,
-			test2.(AllGroupsEvalResult).cols[i],
+			test2.(AllGroupSetsEvalResult).cols[i],
 			CellPossibilities{1, 3, 4, 5, 6, 7, 8, 9},
 		)
 		testing.expectf(
 			t,
-			test2.(AllGroupsEvalResult).sqrs[i] == CellPossibilities{1, 3, 4, 5, 6, 7, 8, 9},
+			test2.(AllGroupSetsEvalResult).sqrs[i] == CellPossibilities{1, 3, 4, 5, 6, 7, 8, 9},
 			`Map_Over_Puzzle_By_Group result.sqrs[%v] = %v; Expected %v`,
 			i,
-			test2.(AllGroupsEvalResult).sqrs[i],
+			test2.(AllGroupSetsEvalResult).sqrs[i],
 			CellPossibilities{1, 3, 4, 5, 6, 7, 8, 9},
 		)
 	}
