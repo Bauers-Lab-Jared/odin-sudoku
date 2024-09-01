@@ -52,7 +52,7 @@ tasks:
     sources:
       - "src/**/*.odin"
     cmds:
-      - odin test test/ -out:debug/main -o:none -debug -all-packages
+      - odin test test/ -out:debug/main -o:none -all-packages
     aliases:
       - test
     method: none
