@@ -7,14 +7,49 @@ Cell :: union {
 	CellPossibilities,
 }
 CellPossibilities :: bit_set[1 ..= 9]
+CellCoords :: struct {
+	row, col: u8,
+}
+CellRef :: struct {
+	using coords: CellCoords,
+	refValues:    [2]Cell,
+}
+
+SudokuLogicType :: enum {
+	group_conflict,
+	last_possible,
+	obvious_pair,
+	obvious_trio,
+	hidden_single,
+	hidden_pair,
+	hidden_trio,
+	intersect_pin, //pointing pair/trio
+	x_wing,
+	y_wing,
+	swordfish,
+	binary_guess,
+}
+
+SudokuAction :: struct {
+	logic:            SudokuLogicType,
+	changed, inRefTo: ^[]CellRef,
+}
+
+SudokuLog :: ^[]SudokuAction
 
 CellData :: [9][9]Cell
 CellGroup :: [9]^Cell
 SudokuPuzzle :: struct {
 	data: CellData,
-	rows: [9]CellGroup,
-	cols: [9]CellGroup,
-	sqrs: [9]CellGroup,
+	log:  ^SudokuLog,
+}
+
+SudokuWorkspace :: struct {
+	stack: ^[]SudokuPuzzle,
+	index: uint,
+	rows:  [9]CellGroup,
+	cols:  [9]CellGroup,
+	sqrs:  [9]CellGroup,
 }
 
 CellEvalResult :: Cell
