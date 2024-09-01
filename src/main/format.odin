@@ -1,12 +1,20 @@
 package SudokuSolver
 
+import "base:runtime"
 import "core:fmt"
 import "core:io"
-import "core:runtime"
 import "core:strconv"
 import "core:strings"
 
-format_puzzle_str :: proc(puzzle: ^SudokuPuzzle, allocator := context.allocator) -> string {
+make_puzzle_format_builder :: proc(
+	puzzle: ^SudokuPuzzle,
+	builder: strings.Builder = {},
+	allocator := context.allocator,
+) -> (
+	res: strings.Builder,
+	err: runtime.Allocator_Error,
+) {
+	builder := builder
 
 	puzzleStringTemplate := `
      . . . | . . . | . . . 
@@ -22,7 +30,12 @@ format_puzzle_str :: proc(puzzle: ^SudokuPuzzle, allocator := context.allocator)
      . . . | . . . | . . . 
 `
 
-	builder := strings.builder_make(0, len(puzzleStringTemplate), allocator)
+	if strings.builder_len(builder) == 0 {
+		builder = strings.builder_make(0, len(puzzleStringTemplate), allocator) or_return
+	} else if strings.builder_space(builder) < len(puzzleStringTemplate) {
+		strings.builder_grow(&builder, len(puzzleStringTemplate))
+	}
+	strings.builder_reset(&builder)
 
 	cellIndex: int
 	for char in puzzleStringTemplate {
@@ -47,10 +60,10 @@ format_puzzle_str :: proc(puzzle: ^SudokuPuzzle, allocator := context.allocator)
 		}
 	}
 
-	return strings.to_string(builder)
+	return builder, nil
 }
 
-format_puzzle_str_full :: proc(
+make_puzzle_format_builder_full :: proc(
 	puzzle: ^SudokuPuzzle,
 	allocator := context.allocator,
 ) -> (

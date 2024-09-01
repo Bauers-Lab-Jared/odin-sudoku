@@ -26,7 +26,10 @@ test_format_puzzle_str :: proc(t: ^testing.T) {
 `
 	puzzle: SudokuPuzzle
 	parse_sudoku_line(&puzzle, puzzleDef)
-	pString := format_puzzle_str(&puzzle)
+
+	builder, _ := make_puzzle_format_builder(&puzzle)
+	defer strings.builder_destroy(&builder)
+	pString := strings.to_string(builder)
 
 	testing.expect(
 		t,
@@ -84,7 +87,7 @@ test_format_puzzle_str_full :: proc(t: ^testing.T) {
 		c -= CellPossibilities{6, 9, 2, 8}
 	}
 
-	builder, _ := format_puzzle_str_full(&puzzle)
+	builder, _ := make_puzzle_format_builder_full(&puzzle)
 	defer strings.builder_destroy(&builder)
 	pString := strings.to_string(builder)
 
