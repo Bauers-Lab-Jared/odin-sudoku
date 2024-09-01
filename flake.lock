@@ -244,16 +244,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1724531977,
-        "narHash": "sha256-XROVLf9ti4rrNCFLr+DmXRZtPjCQTW4cYy59owTEmxk=",
+        "lastModified": 1724819573,
+        "narHash": "sha256-GnR7/ibgIH1vhoy8cYdmXE6iyZqKqFxQSVkFgosBh6w=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "2527da1ef492c495d5391f3bcf9c1dd9f4514e32",
+        "rev": "71e91c409d1e654808b2621f28a327acfdad8dc2",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
-        "ref": "nixos-24.05",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -281,11 +281,11 @@
         "snowfall-lib": "snowfall-lib"
       },
       "locked": {
-        "lastModified": 1724824707,
-        "narHash": "sha256-ro8F3wM+fKzXZLNsbHcHd+Qs8Y90NlKX0NZeaEDAplI=",
+        "lastModified": 1725144276,
+        "narHash": "sha256-gUf17uv/PwN4zd8HFfXLxhzVigIrDdHd90UPANCaXko=",
         "owner": "bauers-lab-jared",
         "repo": "nixvim",
-        "rev": "37708172a331ee8b7c4e8b4afef13551dbac5d1c",
+        "rev": "418bf089707e0ba5ae51df7aff5293ae8cefdbd0",
         "type": "github"
       },
       "original": {

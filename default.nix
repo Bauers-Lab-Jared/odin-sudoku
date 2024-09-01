@@ -1,8 +1,6 @@
 {
   stdenv,
   odin,
-  clang,
-  llvm_17,
   go-task,
   qqwing,
   gdb,
@@ -16,8 +14,6 @@ stdenv.mkDerivation rec {
     gdb
     go-task
     odin
-    clang
-    llvm_17
     qqwing
   ];
 
