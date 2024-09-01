@@ -41,15 +41,10 @@ CellData :: [9][9]Cell
 CellGroup :: [9]^Cell
 SudokuPuzzle :: struct {
 	data: CellData,
+	rows: [9]CellGroup,
+	cols: [9]CellGroup,
+	sqrs: [9]CellGroup,
 	log:  ^SudokuLog,
-}
-
-SudokuWorkspace :: struct {
-	stack: ^[]SudokuPuzzle,
-	index: uint,
-	rows:  [9]CellGroup,
-	cols:  [9]CellGroup,
-	sqrs:  [9]CellGroup,
 }
 
 CellEvalResult :: Cell
@@ -91,11 +86,11 @@ puzzle_init :: proc(puzzle: ^SudokuPuzzle) {
 	for row in 0 ..= 8 {
 		for col in 0 ..= 8 {
 			puzzle.data[row][col] = CellPossibilities{1, 2, 3, 4, 5, 6, 7, 8, 9}
+			ptr := &puzzle.data[row][col]
 
-			puzzle.rows[row][col] = &puzzle.data[row][col]
-			puzzle.cols[col][row] = &puzzle.data[row][col]
-			puzzle.sqrs[(col / 3) % 3 + 3 * (row / 3 % 3)][col % 3 + 3 * (row % 3)] =
-			&puzzle.data[row][col]
+			puzzle.rows[row][col] = ptr
+			puzzle.cols[col][row] = ptr
+			puzzle.sqrs[(col / 3) % 3 + 3 * (row / 3 % 3)][col % 3 + 3 * (row % 3)] = ptr
 		}
 	}
 	return
