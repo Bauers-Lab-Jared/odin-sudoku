@@ -27,9 +27,11 @@ test_format_puzzle_str :: proc(t: ^testing.T) {
 	puzzle: SudokuPuzzle
 	parse_sudoku_line(&puzzle, puzzleDef)
 
-	builder, _ := make_puzzle_format_builder(&puzzle)
-	defer strings.builder_destroy(&builder)
-	pString := strings.to_string(builder)
+
+	printBuilder := strings.builder_make(0, 8192, context.allocator)
+	make_puzzle_format_builder(&puzzle, &printBuilder)
+	defer strings.builder_destroy(&printBuilder)
+	pString := strings.to_string(printBuilder)
 
 	testing.expect(
 		t,

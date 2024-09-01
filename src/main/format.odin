@@ -8,14 +8,11 @@ import "core:strings"
 
 make_puzzle_format_builder :: proc(
 	puzzle: ^SudokuPuzzle,
-	builder: strings.Builder = {},
+	builder: ^strings.Builder,
 	allocator := context.allocator,
 ) -> (
-	res: strings.Builder,
 	err: runtime.Allocator_Error,
 ) {
-	builder := builder
-
 	puzzleStringTemplate := `
      . . . | . . . | . . . 
      . . . | . . . | . . . 
@@ -29,13 +26,7 @@ make_puzzle_format_builder :: proc(
      . . . | . . . | . . . 
      . . . | . . . | . . . 
 `
-
-	if strings.builder_len(builder) == 0 {
-		builder = strings.builder_make(0, len(puzzleStringTemplate), allocator) or_return
-	} else if strings.builder_space(builder) < len(puzzleStringTemplate) {
-		strings.builder_grow(&builder, len(puzzleStringTemplate))
-	}
-	strings.builder_reset(&builder)
+	strings.builder_reset(builder)
 
 	cellIndex: int
 	for char in puzzleStringTemplate {
@@ -44,23 +35,23 @@ make_puzzle_format_builder :: proc(
 			if cellIndex < 81 {
 				if cell_solved {
 					if cell >= 1 && cell <= 9 {
-						strings.write_int(&builder, cast(int)cell)
+						strings.write_int(builder, cast(int)cell)
 					} else {
-						strings.write_byte(&builder, '!')
+						strings.write_byte(builder, '!')
 					}
 				} else {
-					strings.write_byte(&builder, cast(u8)char)
+					strings.write_byte(builder, cast(u8)char)
 				}
 				cellIndex += 1
 			} else {
-				strings.write_byte(&builder, '?')
+				strings.write_byte(builder, '?')
 			}
 		} else {
-			strings.write_byte(&builder, cast(u8)char)
+			strings.write_byte(builder, cast(u8)char)
 		}
 	}
 
-	return builder, nil
+	return nil
 }
 
 make_puzzle_format_builder_full :: proc(
