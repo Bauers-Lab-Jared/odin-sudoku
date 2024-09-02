@@ -89,8 +89,9 @@ test_format_puzzle_str_full :: proc(t: ^testing.T) {
 		c -= CellPossibilities{6, 9, 2, 8}
 	}
 
-	builder, _ := make_puzzle_format_builder_full(&puzzle)
+	builder := strings.builder_make(0, 8192)
 	defer strings.builder_destroy(&builder)
+	make_puzzle_format_builder_full(&puzzle, &builder)
 	pString := strings.to_string(builder)
 
 	testing.expect(

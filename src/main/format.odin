@@ -56,9 +56,9 @@ make_puzzle_format_builder :: proc(
 
 make_puzzle_format_builder_full :: proc(
 	puzzle: ^SudokuPuzzle,
+	builder: ^strings.Builder,
 	allocator := context.allocator,
 ) -> (
-	res: strings.Builder,
 	err: runtime.Allocator_Error,
 ) {
 
@@ -84,7 +84,7 @@ make_puzzle_format_builder_full :: proc(
 	innerHoriLine :: innerHoriG + outerVert + innerHoriG + outerVert + innerHoriG
 	outerHoriLine :: outerHoriG + outerInt + outerHoriG + outerInt + outerHoriG
 
-	builder := strings.builder_make(0, 5120, allocator) or_return
+	strings.builder_reset(builder)
 	subrows: [3]strings.Builder
 	defer for &buf in subrows {
 		strings.builder_destroy(&buf)
@@ -97,9 +97,9 @@ make_puzzle_format_builder_full :: proc(
 		switch rowIndex {
 		case 0:
 		case 3, 6:
-			strings.write_string(&builder, "\n" + outerHoriLine + "\n")
+			strings.write_string(builder, "\n" + outerHoriLine + "\n")
 		case:
-			strings.write_string(&builder, "\n" + innerHoriLine + "\n")
+			strings.write_string(builder, "\n" + innerHoriLine + "\n")
 		}
 
 		for &buf in subrows {
@@ -150,12 +150,12 @@ make_puzzle_format_builder_full :: proc(
 			}
 		}
 
-		strings.write_string(&builder, strings.to_string(subrows[0]))
-		strings.write_string(&builder, "\n")
-		strings.write_string(&builder, strings.to_string(subrows[1]))
-		strings.write_string(&builder, "\n")
-		strings.write_string(&builder, strings.to_string(subrows[2]))
+		strings.write_string(builder, strings.to_string(subrows[0]))
+		strings.write_string(builder, "\n")
+		strings.write_string(builder, strings.to_string(subrows[1]))
+		strings.write_string(builder, "\n")
+		strings.write_string(builder, strings.to_string(subrows[2]))
 	}
 
-	return builder, nil
+	return nil
 }
