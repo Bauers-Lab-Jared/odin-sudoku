@@ -72,10 +72,10 @@ make_puzzle_format_builder_full :: proc(
 	outerInt :: "╬"
 	lineLength :: 71
 	emptyP :: emptySpace + emptySpace
-	innerHoriP :: innerHor + innerHor
+	innerHoriP :: emptySpace + innerHor
 	outerHoriP :: outerHor + outerHor
 	emptyC :: emptyP + emptyP + emptyP + emptySpace
-	innerHoriC :: innerHoriP + innerHoriP + innerHoriP + innerHor
+	innerHoriC :: innerHoriP + innerHoriP + innerHoriP + emptySpace
 	outerHoriC :: outerHoriP + outerHoriP + outerHoriP + outerHor
 	emptyG :: emptyC + innerVert + emptyC + innerVert + emptyC
 	innerHoriG :: innerHoriC + innerInt + innerHoriC + innerInt + innerHoriC
@@ -115,19 +115,19 @@ make_puzzle_format_builder_full :: proc(
 				case 3, 6:
 					prefix = outerVert + emptySpace
 				case:
-					prefix = innerVert + emptySpace
+					prefix = srIndex == 1 ? innerVert + emptySpace : emptySpace + emptySpace
 				}
 				strings.write_string(&subrow, prefix)
 				switch c in cell {
 				case u16:
-					strings.write_string(&subrow, ruledOut + emptySpace)
+					strings.write_string(&subrow, emptySpace + emptySpace)
 					if srIndex == 1 {
 						strings.write_byte(&subrow, u8('0' + c))
 						strings.write_string(&subrow, emptySpace)
 					} else {
-						strings.write_string(&subrow, ruledOut + emptySpace)
+						strings.write_string(&subrow, emptySpace + emptySpace)
 					}
-					strings.write_string(&subrow, ruledOut + emptySpace)
+					strings.write_string(&subrow, emptySpace + emptySpace)
 				case CellPossibilities:
 					for i in 1 ..= 3 {
 						cellPossibility := i + srIndex * 3
