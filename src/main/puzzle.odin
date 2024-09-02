@@ -16,7 +16,7 @@ CellRef :: struct {
 }
 
 SudokuLogicType :: enum {
-	group_conflict,
+	obvious_single,
 	last_possible,
 	obvious_pair,
 	obvious_trio,
@@ -32,7 +32,7 @@ SudokuLogicType :: enum {
 
 SudokuAction :: struct {
 	logic:            SudokuLogicType,
-	changed, inRefTo: ^[]CellRef,
+	changed, inRefTo: [9]CellRef,
 }
 
 SudokuLog :: ^[]SudokuAction
