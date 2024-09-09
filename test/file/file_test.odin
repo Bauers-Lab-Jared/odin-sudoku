@@ -42,14 +42,8 @@ test_read_sudoku_file :: proc(t: ^testing.T) {
 ..94....1.6..95...2....7.95...2.............47.1..9...6......1.4.5.2.....1.8.42.7
     `
 
-	pBuff, allocErr := puzzle_buffer_make()
+	pBuff, allocErr := make([dynamic]SudokuPuzzle, 0, 32)
 	defer delete(pBuff)
-
-	testing.expect(
-		t,
-		allocErr == nil,
-		fmt.tprintf("Expected no error (nil) on puzzle_buffer_make(), got %v", allocErr),
-	)
 
 	nPuzzles, nLines, err := read_sudoku_file(testFile, &pBuff)
 	testing.expect(

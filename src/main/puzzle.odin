@@ -1,5 +1,6 @@
 package SudokuSolver
 
+import "../waffleLib"
 import "base:runtime"
 
 Cell :: union {
@@ -35,16 +36,21 @@ SudokuAction :: struct {
 	changed, inRefTo: [9]CellRef,
 }
 
-SudokuLog :: ^[]SudokuAction
+SudokuLog :: [dynamic]SudokuAction
 
 CellData :: [9][9]Cell
 CellGroup :: [9]^Cell
 SudokuPuzzle :: struct {
 	data: CellData,
-	rows: [9]CellGroup,
-	cols: [9]CellGroup,
-	sqrs: [9]CellGroup,
 	log:  ^SudokuLog,
+}
+
+SudokuWorkspace :: struct {
+	puzzle:  ^SudokuPuzzle,
+	rows:    [9]CellGroup,
+	cols:    [9]CellGroup,
+	sqrs:    [9]CellGroup,
+	scratch: ^SudokuLog,
 }
 
 CellEvalResult :: Cell
@@ -61,104 +67,45 @@ PuzzleEvalResult :: union {
 	AllGroupSetsEvalResult,
 }
 
-puzzle_buffer_make :: proc(
-	allocator := context.allocator,
-) -> (
-	res: [dynamic]SudokuPuzzle,
-	err: runtime.Allocator_Error,
-) {
-	return make([dynamic]SudokuPuzzle, 0, 16)
-}
-
-puzzle_buffer_append :: proc(
-	puzzleBuffer: ^[dynamic]SudokuPuzzle,
-	puzzle: ^SudokuPuzzle,
-	allocator := context.allocator,
-) -> runtime.Allocator_Error {
-	if len(puzzleBuffer) == cap(puzzleBuffer) {
-		reserve(puzzleBuffer, len(puzzleBuffer) * 2) or_return
-	}
-	append(puzzleBuffer, puzzle^) or_return
-	return nil
-}
-
 puzzle_init :: proc(puzzle: ^SudokuPuzzle) {
 	for row in 0 ..= 8 {
 		for col in 0 ..= 8 {
 			puzzle.data[row][col] = CellPossibilities{1, 2, 3, 4, 5, 6, 7, 8, 9}
-			ptr := &puzzle.data[row][col]
-
-			puzzle.rows[row][col] = ptr
-			puzzle.cols[col][row] = ptr
-			puzzle.sqrs[(col / 3) % 3 + 3 * (row / 3 % 3)][col % 3 + 3 * (row % 3)] = ptr
 		}
 	}
 	return
 }
 
-CellEval :: proc(c: ^Cell) -> CellEvalResult
-GroupEval :: proc(group: ^CellGroup) -> GroupEvalResult
+set_workspace_Puzzle :: proc(workspace: ^SudokuWorkspace, puzzle: ^SudokuPuzzle) {
+	workspace.puzzle = puzzle
 
-map_over_group :: proc(group: ^CellGroup, f: CellEval) -> GroupEvalResult {
-	result: GroupEvalResult
-	for cell, i in group {
-		result[i] = f(cell)
+	for row in 0 ..= 8 {
+		for col in 0 ..= 8 {
+			ptr := &puzzle.data[row][col]
+
+			workspace.rows[row][col] = ptr
+			workspace.cols[col][row] = ptr
+			workspace.sqrs[(col / 3) % 3 + 3 * (row / 3 % 3)][col % 3 + 3 * (row % 3)] = ptr
+		}
 	}
-	return result
+	return
 }
 
-map_over_groupSet_by_cell :: proc(groupSet: ^[9]CellGroup, f: CellEval) -> [9]GroupEvalResult {
-	result: [9]GroupEvalResult
-	for &group, i in groupSet {
-		result[i] = map_over_group(&group, f)
-	}
-	return result
-}
-
-map_over_groupSet_by_group :: proc(groupSet: ^[9]CellGroup, f: GroupEval) -> [9]GroupEvalResult {
-	result: [9]GroupEvalResult
-	for &group, i in groupSet {
-		result[i] = f(&group)
-	}
-	return result
-}
-
-map_over_groupSet :: proc {
-	map_over_groupSet_by_cell,
-	map_over_groupSet_by_group,
-}
-
-map_over_puzzle_by_cell :: proc(puzzle: ^SudokuPuzzle, f: CellEval) -> PuzzleEvalResult {
-	result: GroupSetEvalResult
-	result = map_over_groupSet(&puzzle.rows, f)
-	return result
-}
-
-map_over_puzzle_by_group :: proc(puzzle: ^SudokuPuzzle, f: GroupEval) -> PuzzleEvalResult {
-	result: AllGroupSetsEvalResult
-	result.rows = map_over_groupSet(&puzzle.rows, f)
-	result.cols = map_over_groupSet(&puzzle.cols, f)
-	result.sqrs = map_over_groupSet(&puzzle.sqrs, f)
-	return result
-}
-
-map_over_puzzle :: proc {
-	map_over_puzzle_by_cell,
-	map_over_puzzle_by_group,
-}
-
-check_solved_cells :: proc(puzzle: ^SudokuPuzzle) -> (result: GroupSetEvalResult) {
-	result = map_over_puzzle(puzzle, proc(c: ^Cell) -> CellEvalResult {
-		cellResult: CellEvalResult
-		cell, isSet := c^.(CellPossibilities)
-		if isSet && card(cell) == 1 {
+check_solved_cell :: proc(c: ^Cell) -> (isSolved: bool) {
+	switch &cell in c^ {
+	case u16:
+		return cell >= 1 && cell <= 9
+	case CellPossibilities:
+		if card(cell) == 1 {
 			for i in 1 ..= 9 {
 				if i in cell {
-					cellResult = u16(i)
+					c^ = u16(i)
+					return true
 				}
 			}
 		}
-		return cellResult
-	}).(GroupSetEvalResult)
-	return result
+		return false
+	case:
+		return false
+	}
 }

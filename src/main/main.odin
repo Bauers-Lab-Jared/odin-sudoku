@@ -6,17 +6,9 @@ import "core:os"
 import "core:strings"
 
 main :: proc() {
-	topLevelArena: virtual.Arena
-	alloc_err := virtual.arena_init_growing(&topLevelArena, 262144)
-	defer virtual.arena_destroy(&topLevelArena)
-	if alloc_err != nil {
-		fmt.panicf("Failed to allocate initial memory.")
-	}
-	context.allocator = virtual.arena_allocator(&topLevelArena)
-
 	printBuilder := strings.builder_make(0, 8192)
 	defer strings.builder_destroy(&printBuilder)
-	puzzles, _ := puzzle_buffer_make()
+	puzzles, _ := make([dynamic]SudokuPuzzle)
 	defer delete(puzzles)
 
 	fmt.println("Sudoku Solver")

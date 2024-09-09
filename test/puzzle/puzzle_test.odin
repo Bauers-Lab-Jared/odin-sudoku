@@ -22,98 +22,56 @@ Test_Puzzle_Init :: proc(t: ^testing.T) {
 				col,
 				testPuzzle.data[row][col],
 			)
+		}
+	}
+}
 
+
+@(test)
+Test_Workspace_Pointers :: proc(t: ^testing.T) {
+	using src
+
+	testPuzzle: SudokuPuzzle
+	puzzle_init(&testPuzzle)
+	ws: SudokuWorkspace
+	set_workspace_Puzzle(&ws, &testPuzzle)
+	i: u16
+	for row in 0 ..= 8 {
+		for col in 0 ..= 8 {
 			testPuzzle.data[row][col] = i
 
 			testing.expectf(
 				t,
-				testPuzzle.rows[row][col]^ == i,
+				ws.rows[row][col]^ == i,
 				`puzzle.rows[%v][%v]=%v; Expected %v`,
 				row,
 				col,
-				testPuzzle.rows[row][col]^,
+				ws.rows[row][col]^,
 				testPuzzle.data[row][col],
 			)
 
 			testing.expectf(
 				t,
-				testPuzzle.cols[col][row]^ == i,
+				ws.cols[col][row]^ == i,
 				`puzzle.cols[%v][%v]=%v; Expected %v`,
 				col,
 				row,
-				testPuzzle.cols[col][row]^,
+				ws.cols[col][row]^,
 				testPuzzle.data[row][col],
 			)
 
 			testing.expectf(
 				t,
-				testPuzzle.sqrs[(col / 3) % 3 + 3 * (row / 3 % 3)][col % 3 + 3 * (row % 3)]^ == i,
+				ws.sqrs[(col / 3) % 3 + 3 * (row / 3 % 3)][col % 3 + 3 * (row % 3)]^ == i,
 				`puzzle.sqrs[%v][%v]=%v; Expected %v`,
 				(col / 3) % 3 + 3 * (row / 3 % 3),
 				col % 3 + 3 * (row % 3),
-				testPuzzle.sqrs[(col / 3) % 3 + 3 * (row / 3 % 3)][col % 3 + 3 * (row % 3)]^,
+				ws.sqrs[(col / 3) % 3 + 3 * (row / 3 % 3)][col % 3 + 3 * (row % 3)]^,
 				testPuzzle.data[row][col],
 			)
 
 			i += 1
 		}
-	}
-}
-
-@(test)
-Test_Map_Functions :: proc(t: ^testing.T = {}) {
-	using src
-
-	testPuzzle: SudokuPuzzle
-	puzzle_init(&testPuzzle)
-
-	test1 := map_over_puzzle(&testPuzzle, proc(c: ^Cell) -> CellEvalResult {
-		result := c^.(CellPossibilities) - CellPossibilities{1}
-		return result
-	})
-
-	test2 := map_over_puzzle(&testPuzzle, proc(g: ^CellGroup) -> GroupEvalResult {
-		result: GroupEvalResult
-		for &c, i in g {
-			result[i] = c^.(CellPossibilities) - CellPossibilities{2}
-		}
-		return result
-	})
-
-	for i in 0 ..= 8 {
-		testing.expectf(
-			t,
-			test1.(GroupSetEvalResult)[i] == CellPossibilities{2, 3, 4, 5, 6, 7, 8, 9},
-			`Map_Over_Puzzle_By_Cell result[%v] = %v; Expected %v`,
-			i,
-			test1.(GroupSetEvalResult)[i],
-			CellPossibilities{2, 3, 4, 5, 6, 7, 8, 9},
-		)
-
-		testing.expectf(
-			t,
-			test2.(AllGroupSetsEvalResult).rows[i] == CellPossibilities{1, 3, 4, 5, 6, 7, 8, 9},
-			`Map_Over_Puzzle_By_Group result.rows[%v] = %v; Expected %v`,
-			i,
-			test2.(AllGroupSetsEvalResult).rows[i],
-			CellPossibilities{1, 3, 4, 5, 6, 7, 8, 9},
-		)
-		testing.expectf(
-			t,
-			test2.(AllGroupSetsEvalResult).cols[i] == CellPossibilities{1, 3, 4, 5, 6, 7, 8, 9},
-			`Map_Over_Puzzle_By_Group result.cols[%v] = %v; Expected %v`,
-			i,
-			test2.(AllGroupSetsEvalResult).cols[i],
-			CellPossibilities{1, 3, 4, 5, 6, 7, 8, 9},
-		)
-		testing.expectf(
-			t,
-			test2.(AllGroupSetsEvalResult).sqrs[i] == CellPossibilities{1, 3, 4, 5, 6, 7, 8, 9},
-			`Map_Over_Puzzle_By_Group result.sqrs[%v] = %v; Expected %v`,
-			i,
-			test2.(AllGroupSetsEvalResult).sqrs[i],
-			CellPossibilities{1, 3, 4, 5, 6, 7, 8, 9},
-		)
 	}
 }
 
@@ -224,14 +182,36 @@ Test_Check_Solved_Cells :: proc(t: ^testing.T = {}) {
 	lut[7] = {nil, nil, nil, nil, nil, nil, nil, nil, 9}
 	lut[8] = {nil, nil, nil, nil, nil, nil, nil, nil, 9}
 
-	result := check_solved_cells(&testPuzzle)
-
 	for x in 0 ..< 9 {
 		for y in 0 ..< 9 {
+			isSolved := check_solved_cell(&testPuzzle.data[x][y])
+			expectlut := lut[x][y] != nil ? lut[x][y] : testPuzzle.data[x][y]
 			testing.expect(
 				t,
-				result[x][y] == lut[x][y],
-				fmt.tprintf("Expected [%v][%v] = %v; got %v", x, y, lut[x][y], result[x][y]),
+				testPuzzle.data[x][y] == expectlut,
+				fmt.tprintf(
+					"Expected [%v][%v] = %v; got %v",
+					x,
+					y,
+					expectlut,
+					testPuzzle.data[x][y],
+				),
+			)
+
+			expect: bool
+			switch {
+			case x == 1:
+				expect = true
+			case x >= 2 && y == 8:
+				expect = true
+			case:
+				expect = false
+			}
+
+			testing.expect(
+				t,
+				isSolved == expect,
+				fmt.tprintf("Expected [%v][%v] isSolved = %v; got %v", x, y, expect, isSolved),
 			)
 		}
 	}

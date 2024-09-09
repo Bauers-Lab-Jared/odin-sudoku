@@ -1,5 +1,6 @@
 package SudokuSolver
 
+import "../waffleLib"
 import "base:runtime"
 import "core:fmt"
 import "core:os"
@@ -30,7 +31,7 @@ read_sudoku_file :: proc(
 		if len(line) < 81 do continue
 
 		parse_sudoku_line(&puzzle, line[0:81]) or_continue
-		puzzle_buffer_append(puzzleBuffer, &puzzle, allocator) or_return
+		waffleLib.append_doubling(puzzleBuffer, puzzle, allocator) or_return
 		nPuzzles += 1
 	}
 	return nPuzzles, nLines, err
