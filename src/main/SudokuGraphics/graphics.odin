@@ -3,8 +3,10 @@ package SudokuGraphics
 import rl "vendor:raylib"
 
 init_sudoku_window :: proc() {
-	rl.SetConfigFlags({.VSYNC_HINT})
-	rl.InitWindow(1280, 1280, "Odin Sudoku")
+	rl.SetConfigFlags(
+		{.VSYNC_HINT, .BORDERLESS_WINDOWED_MODE, .WINDOW_RESIZABLE, .WINDOW_MOUSE_PASSTHROUGH},
+	)
+	rl.InitWindow(0, 0, "Odin Sudoku")
 	rl.SetTargetFPS(60)
 	return
 }
