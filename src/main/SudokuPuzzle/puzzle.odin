@@ -1,4 +1,4 @@
-package SudokuSolver
+package SudokuPuzzle
 
 import "../waffleLib"
 import "base:runtime"
@@ -40,13 +40,13 @@ SudokuLog :: [dynamic]SudokuAction
 
 CellData :: [9][9]Cell
 CellGroup :: [9]^Cell
-SudokuPuzzle :: struct {
+Puzzle :: struct {
 	data: CellData,
 	log:  ^SudokuLog,
 }
 
 SudokuWorkspace :: struct {
-	puzzle:  ^SudokuPuzzle,
+	puzzle:  ^Puzzle,
 	rows:    [9]CellGroup,
 	cols:    [9]CellGroup,
 	sqrs:    [9]CellGroup,
@@ -67,7 +67,7 @@ PuzzleEvalResult :: union {
 	AllGroupSetsEvalResult,
 }
 
-puzzle_init :: proc(puzzle: ^SudokuPuzzle) {
+puzzle_init :: proc(puzzle: ^Puzzle) {
 	for row in 0 ..= 8 {
 		for col in 0 ..= 8 {
 			puzzle.data[row][col] = CellPossibilities{1, 2, 3, 4, 5, 6, 7, 8, 9}
@@ -76,7 +76,7 @@ puzzle_init :: proc(puzzle: ^SudokuPuzzle) {
 	return
 }
 
-set_workspace_Puzzle :: proc(workspace: ^SudokuWorkspace, puzzle: ^SudokuPuzzle) {
+set_workspace_Puzzle :: proc(workspace: ^SudokuWorkspace, puzzle: ^Puzzle) {
 	workspace.puzzle = puzzle
 
 	for row in 0 ..= 8 {

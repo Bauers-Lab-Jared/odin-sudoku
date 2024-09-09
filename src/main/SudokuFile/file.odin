@@ -1,5 +1,6 @@
-package SudokuSolver
+package SudokuFile
 
+import "../SudokuPuzzle"
 import "../waffleLib"
 import "base:runtime"
 import "core:fmt"
@@ -14,7 +15,7 @@ SudokuRead_Error :: union {
 
 read_sudoku_file :: proc(
 	path: string,
-	puzzleBuffer: ^[dynamic]SudokuPuzzle,
+	puzzleBuffer: ^[dynamic]SudokuPuzzle.Puzzle,
 	allocator := context.allocator,
 ) -> (
 	nPuzzles: int,
@@ -23,7 +24,7 @@ read_sudoku_file :: proc(
 ) {
 	data := os.read_entire_file(path, allocator) or_return
 	defer delete(data)
-	puzzle: SudokuPuzzle
+	puzzle: SudokuPuzzle.Puzzle
 
 	iter := string(data)
 	iter_loop: for line in strings.split_lines_iterator(&iter) {
@@ -43,7 +44,8 @@ ParseError :: enum {
 	StringTooShort,
 }
 
-parse_sudoku_line :: proc(puzzle: ^SudokuPuzzle, inputLine: string) -> (err: ParseError) {
+parse_sudoku_line :: proc(puzzle: ^SudokuPuzzle.Puzzle, inputLine: string) -> (err: ParseError) {
+	using SudokuPuzzle
 	puzzle_init(puzzle)
 	if len(inputLine) < 81 do return ParseError.StringTooShort
 

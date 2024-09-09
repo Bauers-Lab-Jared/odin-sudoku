@@ -1,14 +1,12 @@
-package puzzle
+package SudokuPuzzle
 
-import src "../../src/main"
 import "core:fmt"
 import "core:testing"
 
 @(test)
 Test_Puzzle_Init :: proc(t: ^testing.T) {
-	using src
 
-	testPuzzle: SudokuPuzzle
+	testPuzzle: Puzzle
 	puzzle_init(&testPuzzle)
 	i: u16
 	for row in 0 ..= 8 {
@@ -29,9 +27,8 @@ Test_Puzzle_Init :: proc(t: ^testing.T) {
 
 @(test)
 Test_Workspace_Pointers :: proc(t: ^testing.T) {
-	using src
 
-	testPuzzle: SudokuPuzzle
+	testPuzzle: Puzzle
 	puzzle_init(&testPuzzle)
 	ws: SudokuWorkspace
 	set_workspace_Puzzle(&ws, &testPuzzle)
@@ -77,8 +74,7 @@ Test_Workspace_Pointers :: proc(t: ^testing.T) {
 
 @(test)
 Test_Check_Solved_Cells :: proc(t: ^testing.T = {}) {
-	using src
-	testPuzzle: SudokuPuzzle
+	testPuzzle: Puzzle
 	puzzle_init(&testPuzzle)
 	lut: [9][9]Cell
 

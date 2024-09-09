@@ -1,6 +1,7 @@
-package format
+package SudokuFormat
 
-import src "../../src/main"
+import "../SudokuFile"
+import "../SudokuPuzzle"
 import "core:fmt"
 import "core:io"
 import "core:strings"
@@ -8,7 +9,6 @@ import "core:testing"
 
 @(test)
 test_format_puzzle_str :: proc(t: ^testing.T) {
-	using src
 	using strings
 	puzzleDef := `...6928......74..1..5.8.......4.1...6...5.2.....7...6......6..52.4...61.59.....4.`
 	printDef := `
@@ -24,8 +24,8 @@ test_format_puzzle_str :: proc(t: ^testing.T) {
      2 . 4 | . . . | 6 1 . 
      5 9 . | . . . | . 4 . 
 `
-	puzzle: SudokuPuzzle
-	parse_sudoku_line(&puzzle, puzzleDef)
+	puzzle: SudokuPuzzle.Puzzle
+	SudokuFile.parse_sudoku_line(&puzzle, puzzleDef)
 
 
 	printBuilder := strings.builder_make(0, 8192, context.allocator)
@@ -42,8 +42,9 @@ test_format_puzzle_str :: proc(t: ^testing.T) {
 
 @(test)
 test_format_puzzle_str_full :: proc(t: ^testing.T) {
-	using src
 	using strings
+	using SudokuPuzzle
+
 	puzzleDef := `...6928......74..1..5.8.......4.1...6...5.2.....7...6......6..52.4...61.59.....4.`
 	printDef := ` 1 . 3   1 2 3   1 2 3 ║                       ║         1 2 3   1 2 3 
  4 5 . │ 4 5 6 │ 4 5 6 ║   6   │   9   │   2   ║   8   │ 4 5 6 │ 4 5 6 
@@ -81,8 +82,8 @@ test_format_puzzle_str_full :: proc(t: ^testing.T) {
    5   │   9   │ 4 5 6 ║ 4 5 6 │ 4 5 6 │ 4 5 6 ║ 4 5 6 │   4   │ 4 5 6 
                  7 8 9 ║ 7 8 9   7 8 9   7 8 9 ║ 7 8 9           7 8 9 `
 
-	puzzle: SudokuPuzzle
-	parse_sudoku_line(&puzzle, puzzleDef)
+	puzzle: SudokuPuzzle.Puzzle
+	SudokuFile.parse_sudoku_line(&puzzle, puzzleDef)
 	switch &c in puzzle.data[0][0] {
 	case u16:
 	case CellPossibilities:
