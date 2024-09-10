@@ -19,14 +19,11 @@
       packages.default = appliedOverlay.default;
       devShells.default = pkgs.mkShell {
         inherit (appliedOverlay.default) nativeBuildInputs buildInputs;
-        LD_LIBRARY_PATH = "$LD_LIBRARY_PATH:${
-          pkgs.lib.makeLibraryPath [
-            pkgs.libGL
-            pkgs.xorg.libX11
-          ]
-        }";
 
         packages = [
+          pkgs.go-task
+          pkgs.qqwing
+          pkgs.gdb
           (self.inputs.nixvim.lib.mkNixvim {
             pkgs = nixvimPkgs;
 
