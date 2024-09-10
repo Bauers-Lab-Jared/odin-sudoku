@@ -14,7 +14,7 @@ tasks:
     deps:
       - build
     cmds:
-      - bin/main
+      - nix run .
     method: none
   debug:
     deps:
@@ -28,32 +28,18 @@ tasks:
     cmds:
       - gdb debug/main -i dap
     method: none
-  mkdir-bin:
-    precondition: "[ ! -e bin ]"
-    sources:
-      - "bin/"
-    cmds:
-      - mkdir bin
-    internal: true
   build:
-    deps:
-      - mkdir-bin
-    sources:
-      - "src/**/*.odin"
     cmds:
-      - odin build src/main -out:bin/main
+      - nix build .
     aliases:
       - b
-    generates:
-      - bin/main
   build-test:
     deps:
       - mkdir-debug
     sources:
       - "src/**/*.odin"
     cmds:
-      - task: run
-        # - odin test src/main/ -out:debug/main -o:none -all-packages
+      - odin test src/main/ -out:debug/main -o:none -all-packages
     aliases:
       - test
     method: none
