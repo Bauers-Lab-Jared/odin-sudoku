@@ -24,10 +24,16 @@ main :: proc() {
 
 	SudokuGraphics.init_sudoku_window()
 
+	if c, ok := &puzzles[selectedPuzzle].data[0][0].(SudokuPuzzle.CellPossibilities); ok == true {
+		c^ -= SudokuPuzzle.CellPossibilities{6, 9, 2, 8}
+	}
+	SudokuFormat.make_puzzle_format_builder_full(&puzzles[selectedPuzzle], &printBuilder)
+
+	fmt.println(strings.to_string(printBuilder))
 	for !rl.WindowShouldClose() {
 		SudokuGame.run_game_loop()
 
-		SudokuGraphics.draw_sudoku_window()
+		SudokuGraphics.draw_sudoku_window(&puzzles[selectedPuzzle])
 	}
 
 	rl.CloseWindow()
