@@ -1,6 +1,7 @@
 package SudokuGraphics
 
 import "../SudokuPuzzle"
+import "core:fmt"
 import "core:strconv"
 import "core:strings"
 import rl "vendor:raylib"
@@ -8,6 +9,7 @@ import rl "vendor:raylib"
 SUDOKU_CELL_SIZE :: 37
 SUDOKU_CELL_PAD_INNER :: 1
 SUDOKU_CELL_PAD_OUTER :: 2
+SUDOKU_CELL_PAD_DIFF :: SUDOKU_CELL_PAD_OUTER - SUDOKU_CELL_PAD_INNER
 SCREEN_HEIGHT :: SUDOKU_CELL_SIZE * 9 + SUDOKU_CELL_PAD_INNER * 6 + SUDOKU_CELL_PAD_OUTER * 4
 
 init_sudoku_window :: proc() {
@@ -22,17 +24,36 @@ init_sudoku_window :: proc() {
 draw_sudoku_window :: proc(puzzle: ^SudokuPuzzle.Puzzle) {
 	rl.BeginDrawing()
 	rl.ClearBackground({150, 190, 220, 255})
+	screen_height := rl.GetScreenHeight()
+	screen_width := rl.GetScreenWidth()
 	camera := rl.Camera2D {
-		zoom = f32(rl.GetScreenHeight() / SCREEN_HEIGHT),
+		zoom = f32(min(screen_height, screen_width)) / f32(SCREEN_HEIGHT),
 	}
 	rl.BeginMode2D(camera)
 
-	center: i32 = SCREEN_HEIGHT / 2
-	draw_sudoku_cell(&puzzle.data[0][0], center, center)
+	draw_sudoku_puzzle(
+		puzzle,
+		i32(f32(screen_width) / (2.0 * camera.zoom)) - SCREEN_HEIGHT / 2 + SUDOKU_CELL_PAD_OUTER,
+		i32(f32(screen_height) / (2.0 * camera.zoom)) - SCREEN_HEIGHT / 2 + SUDOKU_CELL_PAD_OUTER,
+	)
 
 	rl.EndMode2D()
 	rl.EndDrawing()
 	return
+}
+
+draw_sudoku_puzzle :: proc(puzzle: ^SudokuPuzzle.Puzzle, anchor_x, anchor_y: i32) {
+	for row, r in puzzle.data {
+		for &cell, c in row {
+			draw_sudoku_cell(
+				&cell,
+				anchor_x +
+				i32((SUDOKU_CELL_SIZE + SUDOKU_CELL_PAD_INNER) * c + SUDOKU_CELL_PAD_DIFF * c / 3),
+				anchor_y +
+				i32((SUDOKU_CELL_SIZE + SUDOKU_CELL_PAD_INNER) * r + SUDOKU_CELL_PAD_DIFF * r / 3),
+			)
+		}
+	}
 }
 
 draw_sudoku_cell :: proc(cell: ^SudokuPuzzle.Cell, anchor_x, anchor_y: i32) {
@@ -49,8 +70,6 @@ draw_sudoku_cell :: proc(cell: ^SudokuPuzzle.Cell, anchor_x, anchor_y: i32) {
 	)
 
 	buf: [4]byte
-	loc_x := anchor_x + FONT_SIZE / 2
-	loc_y := anchor_y + FONT_SIZE / 4
 	switch c in cell^ {
 	case u16:
 		switch c {
@@ -78,8 +97,8 @@ draw_sudoku_cell :: proc(cell: ^SudokuPuzzle.Cell, anchor_x, anchor_y: i32) {
 				if pos in c {
 					rl.DrawText(
 						strings.clone_to_cstring(strconv.itoa(buf[:], pos)),
-						loc_x + i32((row - 1) * CHAR_SPACE),
-						loc_y + i32((col - 1) * CHAR_SPACE),
+						(anchor_x + FONT_SIZE / 2) + i32((row - 1) * CHAR_SPACE),
+						(anchor_y + FONT_SIZE / 4) + i32((col - 1) * CHAR_SPACE),
 						FONT_SIZE,
 						{0, 0, 0, 255},
 					)
