@@ -24,14 +24,13 @@
         }";
 
         packages = [
-          pkgs.go-task
-          pkgs.qqwing
-          pkgs.gdb
-          pkgs.odin
           (self.inputs.nixvim.lib.mkNixvim {
             pkgs = nixvimPkgs;
-
-            addons = ["proj-odin" "proj-nix"];
+            addons = [
+              #"proj-html" use this for web projects
+              "proj-odin"
+              "proj-nix"
+            ];
           })
         ];
       };

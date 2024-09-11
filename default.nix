@@ -1,6 +1,9 @@
 {
   stdenv,
   odin,
+  go-task,
+  qqwing,
+  gdb,
   coreutils,
   libGL,
   xorg,
@@ -11,6 +14,13 @@
 stdenv.mkDerivation rec {
   pname = "odin-sudoku";
   version = "0.1";
+
+  nativeBuildInputs = [
+    gdb
+    go-task
+    odin
+    qqwing
+  ];
   src = ./src/main;
 
   buildInputs = [
