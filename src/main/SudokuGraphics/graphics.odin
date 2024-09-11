@@ -6,7 +6,7 @@ init_sudoku_window :: proc() {
 	rl.SetConfigFlags(
 		{.VSYNC_HINT, .BORDERLESS_WINDOWED_MODE, .WINDOW_RESIZABLE, .WINDOW_MOUSE_PASSTHROUGH},
 	)
-	rl.InitWindow(0, 0, "Odin Sudoku")
+	rl.InitWindow(800, 800, "Odin Sudoku")
 	rl.SetTargetFPS(60)
 	return
 }
