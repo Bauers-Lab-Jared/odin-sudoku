@@ -6,7 +6,7 @@ import "core:strconv"
 import "core:strings"
 import rl "vendor:raylib"
 
-SUDOKU_CELL_SIZE :: 37
+SUDOKU_CELL_SIZE :: 36
 SUDOKU_CELL_PAD_INNER :: 1
 SUDOKU_CELL_PAD_OUTER :: 2
 SUDOKU_CELL_PAD_DIFF :: SUDOKU_CELL_PAD_OUTER - SUDOKU_CELL_PAD_INNER
@@ -56,56 +56,49 @@ draw_sudoku_puzzle :: proc(puzzle: ^SudokuPuzzle.Puzzle, anchor_x, anchor_y: i32
 	}
 }
 
-draw_sudoku_cell :: proc(cell: ^SudokuPuzzle.Cell, anchor_x, anchor_y: i32) {
-	FONT_SIZE :: CHAR_SPACE * 3 / 4
-	CHAR_SPACE :: (SUDOKU_CELL_SIZE - 1) / 3
-
+draw_sudoku_cell :: proc(cell: ^SudokuPuzzle.Cell, #any_int anchor_x, anchor_y: i32) {
 	using SudokuPuzzle
-	rl.DrawRectangle(
-		i32(anchor_x),
-		i32(anchor_y),
-		SUDOKU_CELL_SIZE,
-		SUDOKU_CELL_SIZE,
-		{50, 150, 90, 255},
-	)
+	FONT_SIZE :: CHAR_SPACE * 3 / 4
+	FONT_SIZE_SOLVED :: SUDOKU_CELL_SIZE * 3 / 4
+	CHAR_SPACE :: (SUDOKU_CELL_SIZE) / 3
+	draw :: proc(
+		text: string,
+		anchor_x, anchor_y: i32,
+		#any_int row: i32 = 1,
+		#any_int col: i32 = 1,
+		#any_int font_size: i32 = FONT_SIZE_SOLVED,
+		color: rl.Color = {0, 0, 0, 255},
+	) {
+		rl.DrawText(
+			strings.clone_to_cstring(text),
+			((anchor_x - 1) + font_size / 2) + (row - 1) * CHAR_SPACE,
+			(anchor_y + font_size / 4) + (col - 1) * CHAR_SPACE,
+			font_size,
+			color,
+		)
+	}
+
+	rl.DrawRectangle(anchor_x, anchor_y, SUDOKU_CELL_SIZE, SUDOKU_CELL_SIZE, {50, 150, 90, 255})
 
 	buf: [4]byte
 	switch c in cell^ {
 	case u16:
 		switch c {
 		case 1 ..= 9:
-			rl.DrawText(
-				strings.clone_to_cstring(strconv.itoa(buf[:], int(c))),
-				anchor_x + SUDOKU_CELL_SIZE / 2 - FONT_SIZE / 2,
-				anchor_y + SUDOKU_CELL_SIZE / 2 - FONT_SIZE,
-				FONT_SIZE,
-				{0, 0, 0, 255},
-			)
+			draw(strconv.itoa(buf[:], int(c)), anchor_x, anchor_y)
 		case:
-			rl.DrawText(
-				"?!",
-				anchor_x + SUDOKU_CELL_SIZE / 2 - FONT_SIZE / 2,
-				anchor_y + SUDOKU_CELL_SIZE / 2 - FONT_SIZE,
-				FONT_SIZE,
-				{0, 0, 0, 255},
-			)
+			draw("?", anchor_x, anchor_y)
 		}
 	case CellPossibilities:
 		for row in 1 ..= 3 {
 			for col in 1 ..= 3 {
 				pos: int = row + (col - 1) * 3
 				if pos in c {
-					rl.DrawText(
-						strings.clone_to_cstring(strconv.itoa(buf[:], pos)),
-						(anchor_x + FONT_SIZE / 2) + i32((row - 1) * CHAR_SPACE),
-						(anchor_y + FONT_SIZE / 4) + i32((col - 1) * CHAR_SPACE),
-						FONT_SIZE,
-						{0, 0, 0, 255},
-					)
+					draw(strconv.itoa(buf[:], pos), anchor_x, anchor_y, row, col, FONT_SIZE)
 				}
 			}
 		}
 	case:
-		rl.DrawText("?!", anchor_x - 2, anchor_y - 4, FONT_SIZE, {0, 0, 0, 255})
+		draw("!", anchor_x, anchor_y)
 	}
 }
