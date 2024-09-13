@@ -144,16 +144,16 @@ draw_sudoku_cell :: proc(
 	draw :: proc(
 		drawInfo: ^DrawInfo,
 		text: string,
-		row: f32 = 2.0,
-		col: f32 = 2.0,
+		#any_int row: i32 = 2,
+		#any_int col: i32 = 2,
 		font_size: f32 = FONT_SIZE_SOLVED,
 	) {
 		rl.DrawTextEx(
 			drawInfo.font,
 			strings.clone_to_cstring(text),
 			rl.Vector2 {
-				drawInfo.anchor_x + col * (SUDOKU_CELL_SIZE / 4) - CHAR_ASPECT_H * font_size,
-				drawInfo.anchor_y + row * (SUDOKU_CELL_SIZE / 4) - CHAR_ASPECT_V * font_size,
+				drawInfo.anchor_x + f32(col) * (SUDOKU_CELL_SIZE / 4) - CHAR_ASPECT_H * font_size,
+				drawInfo.anchor_y + f32(row) * (SUDOKU_CELL_SIZE / 4) - CHAR_ASPECT_V * font_size,
 			},
 			font_size,
 			0.0,
@@ -186,7 +186,7 @@ draw_sudoku_cell :: proc(
 			for col in 1 ..= 3 {
 				pos: int = row + (col - 1) * 3
 				if pos in c {
-					draw(&drawInfo, strconv.itoa(buf[:], pos), f32(row), f32(col), FONT_SIZE)
+					draw(&drawInfo, strconv.itoa(buf[:], pos), row, col, FONT_SIZE)
 				}
 			}
 		}
