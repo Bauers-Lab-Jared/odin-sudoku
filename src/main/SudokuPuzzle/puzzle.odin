@@ -1,6 +1,6 @@
 package SudokuPuzzle
 
-import "../waffleLib"
+import "../WaffleLib"
 import "base:runtime"
 
 Cell :: union {

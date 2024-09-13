@@ -1,4 +1,4 @@
-package waffleLib
+package WaffleLib
 
 import "base:runtime"
 
