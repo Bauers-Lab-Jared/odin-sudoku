@@ -10,22 +10,28 @@ SUDOKU_CELL_PAD_INNER :: 8
 SUDOKU_CELL_PAD_OUTER :: 16
 SUDOKU_CELL_PAD_DIFF :: SUDOKU_CELL_PAD_OUTER - SUDOKU_CELL_PAD_INNER
 
-draw_sudoku_puzzle :: proc(
-	puzzle: ^SudokuPuzzle.Puzzle,
-	anchor_x, anchor_y: f32,
-	windowData: ^WindowData,
-) {
+draw_sudoku_puzzle :: proc(puzzle: ^SudokuPuzzle.Puzzle, windowData: ^WindowData) {
+	anchor: [2]f32
+	anchor.x =
+		(windowData.window_size.x / (2.0 * windowData.camera.zoom)) -
+		SCREEN_HEIGHT / 2 +
+		SUDOKU_CELL_PAD_OUTER
+	anchor.y =
+		(windowData.window_size.y / (2.0 * windowData.camera.zoom)) -
+		SCREEN_HEIGHT / 2 +
+		SUDOKU_CELL_PAD_OUTER
+
 	for row, r in puzzle.data {
 		for &cell, c in row {
 			draw_sudoku_cell(
 				&cell,
-				anchor_x +
+				anchor.x +
 				f32(
 					SUDOKU_CELL_SIZE * c +
 					SUDOKU_CELL_PAD_INNER * c +
 					SUDOKU_CELL_PAD_DIFF * (c / 3),
 				),
-				anchor_y +
+				anchor.y +
 				f32(
 					SUDOKU_CELL_SIZE * r +
 					SUDOKU_CELL_PAD_INNER * r +

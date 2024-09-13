@@ -2,6 +2,7 @@ package SudokuGraphics
 
 import "../SudokuPuzzle"
 import "core:fmt"
+import "core:math"
 import "core:os"
 import "core:path/filepath"
 import "core:strconv"
@@ -35,7 +36,9 @@ COLORS_YELLOW_B :: rl.Color{250, 171, 24, 255}
 COLORS_RED_B :: rl.Color{241, 85, 161, 255}
 
 WindowData :: struct {
-	font: rl.Font,
+	font:        rl.Font,
+	window_size: [2]f32,
+	camera:      rl.Camera2D,
 }
 
 init_sudoku_window :: proc(windowData: ^WindowData) {
@@ -61,7 +64,7 @@ init_sudoku_window :: proc(windowData: ^WindowData) {
 		nil,
 		250,
 	)
-	rl.SetTargetFPS(15)
+	rl.SetTargetFPS(60)
 	return
 }
 
@@ -72,20 +75,17 @@ close_sudoku_window :: proc(windowData: ^WindowData) {
 
 draw_sudoku_window :: proc(puzzle: ^SudokuPuzzle.Puzzle, windowData: ^WindowData) {
 	rl.BeginDrawing()
-	rl.ClearBackground(COLORS_BLUE_D)
-	screen_height := rl.GetScreenHeight()
-	screen_width := rl.GetScreenWidth()
-	camera := rl.Camera2D {
-		zoom = f32(min(screen_height, screen_width)) / f32(SCREEN_HEIGHT),
+	windowData.window_size.x = f32(rl.GetScreenWidth())
+	windowData.window_size.y = f32(rl.GetScreenHeight())
+	windowData.camera = rl.Camera2D {
+		offset = rl.Vector2{ui_get_hori_offset(windowData), 0.0},
+		zoom   = min(windowData.window_size.x, windowData.window_size.y) / f32(SCREEN_HEIGHT),
 	}
-	rl.BeginMode2D(camera)
+	rl.BeginMode2D(windowData.camera)
 
-	draw_sudoku_puzzle(
-		puzzle,
-		(f32(screen_width) / (2.0 * camera.zoom)) - SCREEN_HEIGHT / 2 + SUDOKU_CELL_PAD_OUTER,
-		(f32(screen_height) / (2.0 * camera.zoom)) - SCREEN_HEIGHT / 2 + SUDOKU_CELL_PAD_OUTER,
-		windowData,
-	)
+	rl.ClearBackground(COLORS_BLUE_D)
+
+	draw_sudoku_puzzle(puzzle, windowData)
 
 	rl.EndMode2D()
 	rl.EndDrawing()
