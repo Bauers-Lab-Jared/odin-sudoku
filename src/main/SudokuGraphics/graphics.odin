@@ -34,11 +34,11 @@ COLORS_GREEN_B :: rl.Color{46, 144, 33, 255}
 COLORS_YELLOW_B :: rl.Color{250, 171, 24, 255}
 COLORS_RED_B :: rl.Color{241, 85, 161, 255}
 
-WindowStuff :: struct {
+WindowData :: struct {
 	font: rl.Font,
 }
 
-init_sudoku_window :: proc(windowStuff: ^WindowStuff) {
+init_sudoku_window :: proc(windowData: ^WindowData) {
 	font_file_path := [2]string {
 		filepath.dir(os.args[0]),
 		"../Resources/share-tech-mono.regular.ttf",
@@ -55,7 +55,7 @@ init_sudoku_window :: proc(windowStuff: ^WindowStuff) {
 		},
 	)
 	rl.InitWindow(3840, 2160, "Odin Sudoku")
-	windowStuff.font = rl.LoadFontEx(
+	windowData.font = rl.LoadFontEx(
 		strings.clone_to_cstring(filepath.join(font_file_path[:])),
 		1024,
 		nil,
@@ -65,12 +65,12 @@ init_sudoku_window :: proc(windowStuff: ^WindowStuff) {
 	return
 }
 
-close_sudoku_window :: proc(windowStuff: ^WindowStuff) {
-	rl.UnloadFont(windowStuff.font)
+close_sudoku_window :: proc(windowData: ^WindowData) {
+	rl.UnloadFont(windowData.font)
 	rl.CloseWindow()
 }
 
-draw_sudoku_window :: proc(puzzle: ^SudokuPuzzle.Puzzle, windowStuff: ^WindowStuff) {
+draw_sudoku_window :: proc(puzzle: ^SudokuPuzzle.Puzzle, windowData: ^WindowData) {
 	rl.BeginDrawing()
 	rl.ClearBackground(COLORS_BLUE_D)
 	screen_height := rl.GetScreenHeight()
@@ -84,7 +84,7 @@ draw_sudoku_window :: proc(puzzle: ^SudokuPuzzle.Puzzle, windowStuff: ^WindowStu
 		puzzle,
 		(f32(screen_width) / (2.0 * camera.zoom)) - SCREEN_HEIGHT / 2 + SUDOKU_CELL_PAD_OUTER,
 		(f32(screen_height) / (2.0 * camera.zoom)) - SCREEN_HEIGHT / 2 + SUDOKU_CELL_PAD_OUTER,
-		windowStuff,
+		windowData,
 	)
 
 	rl.EndMode2D()

@@ -13,7 +13,7 @@ SUDOKU_CELL_PAD_DIFF :: SUDOKU_CELL_PAD_OUTER - SUDOKU_CELL_PAD_INNER
 draw_sudoku_puzzle :: proc(
 	puzzle: ^SudokuPuzzle.Puzzle,
 	anchor_x, anchor_y: f32,
-	windowStuff: ^WindowStuff,
+	windowData: ^WindowData,
 ) {
 	for row, r in puzzle.data {
 		for &cell, c in row {
@@ -31,7 +31,7 @@ draw_sudoku_puzzle :: proc(
 					SUDOKU_CELL_PAD_INNER * r +
 					SUDOKU_CELL_PAD_DIFF * (r / 3),
 				),
-				windowStuff,
+				windowData,
 			)
 		}
 	}
@@ -40,7 +40,7 @@ draw_sudoku_puzzle :: proc(
 draw_sudoku_cell :: proc(
 	cell: ^SudokuPuzzle.Cell,
 	anchor_x, anchor_y: f32,
-	windowStuff: ^WindowStuff,
+	windowData: ^WindowData,
 ) {
 	using SudokuPuzzle
 	FONT_SIZE :: (SUDOKU_CELL_SIZE) / 3.0
@@ -53,7 +53,7 @@ draw_sudoku_cell :: proc(
 		font:               rl.Font,
 		color:              rl.Color,
 	}
-	drawInfo := DrawInfo{anchor_x, anchor_y, windowStuff.font, rl.BLACK}
+	drawInfo := DrawInfo{anchor_x, anchor_y, windowData.font, rl.BLACK}
 
 	draw :: proc(
 		drawInfo: ^DrawInfo,

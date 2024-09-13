@@ -22,17 +22,17 @@ main :: proc() {
 	//	SudokuFormat.make_puzzle_format_builder_full(&puzzles[selectedPuzzle], &printBuilder)
 	//	fmt.println(strings.to_string(printBuilder))
 
-	windowStuff: SudokuGraphics.WindowStuff
+	windowData: SudokuGraphics.WindowData
 
-	SudokuGraphics.init_sudoku_window(&windowStuff)
+	SudokuGraphics.init_sudoku_window(&windowData)
 
 	for !rl.WindowShouldClose() {
 		SudokuGame.run_game_loop()
 
-		SudokuGraphics.draw_sudoku_window(&puzzles[selectedPuzzle], &windowStuff)
+		SudokuGraphics.draw_sudoku_window(&puzzles[selectedPuzzle], &windowData)
 	}
 
-	SudokuGraphics.close_sudoku_window(&windowStuff)
+	SudokuGraphics.close_sudoku_window(&windowData)
 
 	return
 }
