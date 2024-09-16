@@ -7,7 +7,7 @@ Cell :: union {
 	u16,
 	CellPossibilities,
 }
-CellPossibilities :: bit_set[1 ..= 9]
+CellPossibilities :: distinct bit_set[1 ..= 9]
 CellCoords :: struct {
 	row, col: u8,
 }
