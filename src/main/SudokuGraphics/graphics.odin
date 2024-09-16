@@ -88,6 +88,8 @@ draw_sudoku_window :: proc(gameState: ^SudokuGame.GameState, windowData: ^Window
 
 	draw_sudoku_puzzle(gameState, windowData)
 
+	draw_ui_menu(gameState, windowData)
+
 	rl.EndMode2D()
 	rl.EndDrawing()
 	return

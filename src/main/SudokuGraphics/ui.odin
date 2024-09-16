@@ -1,12 +1,13 @@
 package SudokuGraphics
 
+import "../SudokuGame"
 import "core:math"
 import "core:strconv"
 import "core:strings"
 import rl "vendor:raylib"
 
 UI_SIDE_BAR_WIDTH :: 3 * SUDOKU_CELL_SIZE
-UI_SIDE_BAR_SLIDEOUT :: UI_SIDE_BAR_WIDTH + SUDOKU_CELL_PAD_OUTER * 2
+UI_SIDE_BAR_SLIDEOUT :: UI_SIDE_BAR_WIDTH + SUDOKU_CELL_PAD_OUTER
 UI_SIDE_BAR_SLIDEOUT_TRIG_START :: SUDOKU_CELL_SIZE * 3 - UI_SIDE_BAR_SLIDEOUT_TRIG_WIDTH
 UI_SIDE_BAR_SLIDEOUT_TRIG_WIDTH :: SUDOKU_CELL_SIZE / 3
 
@@ -42,4 +43,20 @@ ui_get_hori_offset :: proc(windowData: ^WindowData) -> f32 {
 	}
 
 	return 0
+}
+
+draw_ui_menu :: proc(gameState: ^SudokuGame.GameState, windowData: ^WindowData) {
+	rl.DrawRectangleRounded(
+		rl.Rectangle {
+			windowData.window_size.x / (2.0 * windowData.camera.zoom) + SCREEN_HEIGHT / 2,
+			windowData.window_size.y / (2.0 * windowData.camera.zoom) -
+			SCREEN_HEIGHT / 2 +
+			SUDOKU_CELL_PAD_OUTER,
+			UI_SIDE_BAR_WIDTH,
+			SCREEN_HEIGHT - 2 * SUDOKU_CELL_PAD_OUTER,
+		},
+		0.1,
+		1,
+		COLORS_GRAY,
+	)
 }
