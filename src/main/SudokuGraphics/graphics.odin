@@ -1,5 +1,6 @@
 package SudokuGraphics
 
+import "../SudokuGame"
 import "../SudokuPuzzle"
 import "core:fmt"
 import "core:math"
@@ -73,7 +74,7 @@ close_sudoku_window :: proc(windowData: ^WindowData) {
 	rl.CloseWindow()
 }
 
-draw_sudoku_window :: proc(puzzle: ^SudokuPuzzle.Puzzle, windowData: ^WindowData) {
+draw_sudoku_window :: proc(gameState: ^SudokuGame.GameState, windowData: ^WindowData) {
 	rl.BeginDrawing()
 	windowData.window_size.x = f32(rl.GetScreenWidth())
 	windowData.window_size.y = f32(rl.GetScreenHeight())
@@ -85,7 +86,7 @@ draw_sudoku_window :: proc(puzzle: ^SudokuPuzzle.Puzzle, windowData: ^WindowData
 
 	rl.ClearBackground(COLORS_BLUE_D)
 
-	draw_sudoku_puzzle(puzzle, windowData)
+	draw_sudoku_puzzle(gameState, windowData)
 
 	rl.EndMode2D()
 	rl.EndDrawing()

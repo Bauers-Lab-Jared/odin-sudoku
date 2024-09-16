@@ -1,5 +1,6 @@
 package SudokuGraphics
 
+import "../SudokuGame"
 import "../SudokuPuzzle"
 import "core:strconv"
 import "core:strings"
@@ -10,7 +11,7 @@ SUDOKU_CELL_PAD_INNER :: 8
 SUDOKU_CELL_PAD_OUTER :: 16
 SUDOKU_CELL_PAD_DIFF :: SUDOKU_CELL_PAD_OUTER - SUDOKU_CELL_PAD_INNER
 
-draw_sudoku_puzzle :: proc(puzzle: ^SudokuPuzzle.Puzzle, windowData: ^WindowData) {
+draw_sudoku_puzzle :: proc(gameState: ^SudokuGame.GameState, windowData: ^WindowData) {
 	anchor: [2]f32
 	anchor.x =
 		(windowData.window_size.x / (2.0 * windowData.camera.zoom)) -
@@ -21,7 +22,7 @@ draw_sudoku_puzzle :: proc(puzzle: ^SudokuPuzzle.Puzzle, windowData: ^WindowData
 		SCREEN_HEIGHT / 2 +
 		SUDOKU_CELL_PAD_OUTER
 
-	for row, r in puzzle.data {
+	for row, r in gameState.workspace.puzzle.data {
 		for &cell, c in row {
 			draw_sudoku_cell(
 				&cell,
