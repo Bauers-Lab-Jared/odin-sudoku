@@ -46,17 +46,41 @@ ui_get_hori_offset :: proc(windowData: ^WindowData) -> f32 {
 }
 
 draw_ui_menu :: proc(gameState: ^SudokuGame.GameState, windowData: ^WindowData) {
+	anchor: rl.Vector2
+	anchor.x = windowData.window_size.x / (2.0 * windowData.camera.zoom) + SCREEN_HEIGHT / 2
+	anchor.y =
+		windowData.window_size.y / (2.0 * windowData.camera.zoom) -
+		SCREEN_HEIGHT / 2 +
+		SUDOKU_CELL_PAD_OUTER
+
 	rl.DrawRectangleRounded(
 		rl.Rectangle {
-			windowData.window_size.x / (2.0 * windowData.camera.zoom) + SCREEN_HEIGHT / 2,
-			windowData.window_size.y / (2.0 * windowData.camera.zoom) -
-			SCREEN_HEIGHT / 2 +
-			SUDOKU_CELL_PAD_OUTER,
+			anchor.x,
+			anchor.y,
 			UI_SIDE_BAR_WIDTH,
 			SCREEN_HEIGHT - 2 * SUDOKU_CELL_PAD_OUTER,
 		},
 		0.1,
 		1,
 		COLORS_GRAY,
+	)
+
+	rl.DrawRectangleRec(
+		rl.Rectangle {
+			anchor.x + SUDOKU_CELL_PAD_OUTER,
+			anchor.y + SUDOKU_CELL_PAD_OUTER * 2,
+			UI_SIDE_BAR_WIDTH - SUDOKU_CELL_PAD_OUTER,
+			SUDOKU_CELL_SIZE / 2.5,
+		},
+		COLORS_YELLOW,
+	)
+
+	rl.DrawTextEx(
+		windowData.font,
+		strings.clone_to_cstring(gameState.uiState.menuState.current.text),
+		anchor + SUDOKU_CELL_PAD_OUTER * 2,
+		SUDOKU_CELL_SIZE / 2.5,
+		1,
+		rl.BLACK,
 	)
 }

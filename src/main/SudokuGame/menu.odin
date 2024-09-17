@@ -28,7 +28,7 @@ init_menu :: proc(gameState: ^GameState, allocator := context.allocator) {
 	top = menuList[0]
 	current = top
 
-	top^ = {
+	top^ = Menu {
 		text     = "Menu",
 		selected = 0,
 		buttons  = make([dynamic]Button, allocator),

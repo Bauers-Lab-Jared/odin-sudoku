@@ -27,6 +27,7 @@ main :: proc() {
 
 	SudokuPuzzle.set_workspace_Puzzle(&gameState.workspace, &puzzles[selectedPuzzle])
 
+	SudokuGame.game_init(&gameState)
 	SudokuGraphics.init_sudoku_window(&windowData)
 
 	for !rl.WindowShouldClose() {

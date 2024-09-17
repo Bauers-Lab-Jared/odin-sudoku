@@ -35,6 +35,11 @@ GameState :: struct {
 	uiState:   UIState,
 }
 
+game_init :: proc(gameState: ^GameState) {
+	init_menu(gameState)
+	return
+}
+
 run_game_loop :: proc(gameState: ^GameState) {
 	return
 }
