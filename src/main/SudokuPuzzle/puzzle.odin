@@ -67,13 +67,13 @@ PuzzleEvalResult :: union {
 	AllGroupSetsEvalResult,
 }
 
-puzzle_init :: proc(puzzle: ^Puzzle) {
+puzzle_init :: proc(puzzle: ^Puzzle) -> ^Puzzle {
 	for row in 0 ..= 8 {
 		for col in 0 ..= 8 {
 			puzzle.data[row][col] = CellPossibilities{1, 2, 3, 4, 5, 6, 7, 8, 9}
 		}
 	}
-	return
+	return puzzle
 }
 
 set_workspace_Puzzle :: proc(workspace: ^SudokuWorkspace, puzzle: ^Puzzle) {

@@ -26,6 +26,7 @@ main :: proc() {
 		filepath.join([]string{resources_path, "/puzzles01"}),
 		&gameState.puzzleStack,
 	)
+	if len(gameState.puzzleStack) < 1 do append_elem(&gameState.puzzleStack, SudokuPuzzle.puzzle_init(new(SudokuPuzzle.Puzzle))^)
 	SudokuPuzzle.set_workspace_Puzzle(&gameState.workspace, &gameState.puzzleStack[0])
 
 	//	SudokuFormat.make_puzzle_format_builder_full(&puzzles[selectedPuzzle], &printBuilder)
