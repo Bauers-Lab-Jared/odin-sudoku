@@ -59,6 +59,7 @@ run_game_loop :: proc(using gameState: ^GameState) {
 		if .preinit in controlFlags {
 			set_puzzle_selection(gameState, 0)
 			controlFlags -= {.preinit}
+			uiState.menuState.top.buttons[0].text = "New"
 		} else {
 			inc_puzzle_selection(gameState)
 		}
