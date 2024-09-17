@@ -4,7 +4,6 @@ import "../SudokuGame"
 import "../SudokuPuzzle"
 import "core:fmt"
 import "core:math"
-import "core:os"
 import "core:path/filepath"
 import "core:strconv"
 import "core:strings"
@@ -42,12 +41,7 @@ WindowData :: struct {
 	camera:      rl.Camera2D,
 }
 
-init_sudoku_window :: proc(windowData: ^WindowData) {
-	font_file_path := [2]string {
-		filepath.dir(os.args[0]),
-		"../Resources/share-tech-mono.regular.ttf",
-	}
-	defer delete(font_file_path[0])
+init_sudoku_window :: proc(windowData: ^WindowData, resources_path: string) {
 
 	rl.SetConfigFlags(
 		{
@@ -59,12 +53,17 @@ init_sudoku_window :: proc(windowData: ^WindowData) {
 		},
 	)
 	rl.InitWindow(3840, 2160, "Odin Sudoku")
+
 	windowData.font = rl.LoadFontEx(
-		strings.clone_to_cstring(filepath.join(font_file_path[:])),
+		strings.clone_to_cstring(
+			filepath.join([]string{resources_path, "/share-tech-mono.regular.ttf"}),
+		),
 		1024,
 		nil,
 		250,
 	)
+
+
 	rl.SetTargetFPS(60)
 	return
 }

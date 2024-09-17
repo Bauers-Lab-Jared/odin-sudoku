@@ -37,3 +37,8 @@ init_menu :: proc(gameState: ^GameState, allocator := context.allocator) {
 	append(&top.buttons, Button{text = "Start", on_click = game_start})
 	append(&top.buttons, Button{text = "Quit", on_click = game_quit})
 }
+
+subMenu_click :: proc(subMenu: ^Menu, gameState: ^GameState) {
+	subMenu.superMenu = gameState.uiState.menuState.current
+	gameState.uiState.menuState.current = subMenu
+}
