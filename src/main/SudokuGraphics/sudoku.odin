@@ -10,6 +10,9 @@ SUDOKU_CELL_SIZE :: 128
 SUDOKU_CELL_PAD_INNER :: 8
 SUDOKU_CELL_PAD_OUTER :: 16
 SUDOKU_CELL_PAD_DIFF :: SUDOKU_CELL_PAD_OUTER - SUDOKU_CELL_PAD_INNER
+SUDOKU_SELECTION_COLOR :: COLORS_GREEN_L
+SUDOKU_HIGHLIGHT_CHANGE_COLOR :: COLORS_RED_L
+SUDOKU_HIGHLIGHT_REF_COLOR :: COLORS_YELLOW_L
 
 draw_sudoku_puzzle :: proc(gameState: ^SudokuGame.GameState, windowData: ^WindowData) {
 	anchor: [2]f32
@@ -26,41 +29,46 @@ draw_sudoku_puzzle :: proc(gameState: ^SudokuGame.GameState, windowData: ^Window
 		for &cell, c in row {
 			draw_sudoku_cell(
 				&cell,
-				anchor.x +
-				f32(
-					SUDOKU_CELL_SIZE * c +
-					SUDOKU_CELL_PAD_INNER * c +
-					SUDOKU_CELL_PAD_DIFF * (c / 3),
+				get_draw_opts(
+					r,
+					c,
+					[2]f32 {
+						anchor.x +
+						f32(
+							SUDOKU_CELL_SIZE * c +
+							SUDOKU_CELL_PAD_INNER * c +
+							SUDOKU_CELL_PAD_DIFF * (c / 3),
+						),
+						anchor.y +
+						f32(
+							SUDOKU_CELL_SIZE * r +
+							SUDOKU_CELL_PAD_INNER * r +
+							SUDOKU_CELL_PAD_DIFF * (r / 3),
+						),
+					},
+					gameState,
+					windowData,
 				),
-				anchor.y +
-				f32(
-					SUDOKU_CELL_SIZE * r +
-					SUDOKU_CELL_PAD_INNER * r +
-					SUDOKU_CELL_PAD_DIFF * (r / 3),
-				),
-				windowData,
 			)
 		}
 	}
 }
 
-draw_sudoku_cell :: proc(
-	cell: ^SudokuPuzzle.Cell,
-	anchor_x, anchor_y: f32,
-	windowData: ^WindowData,
-) {
+@(private)
+DrawOpts :: struct {
+	cellColor: rl.Color,
+	numColors: [9]rl.Color,
+	font:      rl.Font,
+	anchor:    [2]f32,
+}
+
+@(private)
+draw_sudoku_cell :: proc(cell: ^SudokuPuzzle.Cell, drawOpts: DrawOpts) {
 	using SudokuPuzzle
 	FONT_SIZE :: (SUDOKU_CELL_SIZE) / 3.0
 	FONT_SIZE_SOLVED :: SUDOKU_CELL_SIZE
 	CHAR_ASPECT_V :: 0.46
 	CHAR_ASPECT_H :: 0.24
-
-	DrawInfo :: struct {
-		anchor_x, anchor_y: f32,
-		font:               rl.Font,
-		color:              rl.Color,
-	}
-	drawInfo := DrawInfo{anchor_x, anchor_y, windowData.font, rl.BLACK}
 
 	draw :: proc(
 		drawInfo: ^DrawInfo,
@@ -113,5 +121,52 @@ draw_sudoku_cell :: proc(
 		}
 	case:
 		draw(&drawInfo, "!")
+	}
+}
+
+@(private)
+get_draw_opts :: proc(
+	#any_int row, col: int,
+	anchor: [2]f32,
+	gameState: ^SudokuGame.GameState,
+	windowData: ^WindowData,
+) -> (
+	drawOpts: DrawOpts,
+) {
+	drawOpts.anchor = anchor
+	drawOpts.font = windowData.font
+
+	removedPossibilities: CellPossibilities
+	refPossibilities: CellPossibilities
+
+	for refCell in gameState.uiState.highlightAction.inRefTo {
+		if refCell == nil do continue
+
+		if refCell.row == row && refCell.col == col {
+			drawOpts.cellColor = SUDOKU_HIGHLIGHT_REF_COLOR
+			if refCell.refValues != nil {
+				refPossibilities = changedCell.refValues.x
+			}
+		}
+	}
+
+	for changedCell in gameState.uiState.highlightAction.changed {
+		if changedCell == nil do continue
+
+		if changedCell.row == row && changedCell.col == col {
+			drawOpts.cellColor = SUDOKU_HIGHLIGHT_CHANGE_COLOR
+			if changedCell.refValues != nil {
+				removedPossibilities = changedCell.refValues.x
+			}
+		}
+	}
+
+	switch sel in gameState.uiState.sudokuSel {
+	case SudokuPuzzle.CellCoords:
+		if sel.x == row && sel.y == col do drawOpts.cellColor = SUDOKU_SELECTION_COLOR
+	case RowNum:
+    if sel.y ==
+	case ColNum:
+	case SqrNum:
 	}
 }
