@@ -52,7 +52,7 @@ init_sudoku_window :: proc(windowData: ^WindowData, resources_path: string) {
 			.WINDOW_MOUSE_PASSTHROUGH,
 		},
 	)
-	rl.InitWindow(3840, 2160, "Odin Sudoku")
+	rl.InitWindow(800, 800, "Odin Sudoku")
 
 	windowData.font = rl.LoadFontEx(
 		strings.clone_to_cstring(
