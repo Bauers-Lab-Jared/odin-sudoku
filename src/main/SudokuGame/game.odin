@@ -3,34 +3,6 @@ package SudokuGame
 import "../SudokuFile"
 import "../SudokuPuzzle"
 
-RowNum :: distinct u8
-ColNum :: distinct u8
-SqrNum :: distinct u8
-SudokuSelection :: union {
-	SudokuPuzzle.CellCoords,
-	RowNum,
-	ColNum,
-	SqrNum,
-}
-
-InputMode :: enum {
-	normal,
-	modify,
-}
-
-ScreenView :: enum {
-	menu,
-	workspace,
-}
-
-UIState :: struct {
-	sudokuSel:       SudokuSelection,
-	highlightAction: SudokuPuzzle.SudokuAction,
-	inputMode:       InputMode,
-	currentView:     ScreenView,
-	menuState:       MenuState,
-}
-
 GameStateFlags :: enum {
 	preinit,
 	quitting,

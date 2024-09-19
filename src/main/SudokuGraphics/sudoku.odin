@@ -13,7 +13,8 @@ SUDOKU_CELL_PAD_DIFF :: SUDOKU_CELL_PAD_OUTER - SUDOKU_CELL_PAD_INNER
 SUDOKU_CELL_TEXT_NORMAL_COLOR :: rl.BLACK
 SUDOKU_CELL_TEXT_HIGHLIGHT_REMOVE_COLOR :: COLORS_RED_B
 SUDOKU_CELL_TEXT_HIGHLIGHT_REF_COLOR :: COLORS_YELLOW_B
-SUDOKU_CELL_SELECTED_COLOR :: COLORS_BLUE_L
+SUDOKU_CELL_SELECTED_COLOR :: COLORS_BLUE
+SUDOKU_GROUP_SELECTED_COLOR :: COLORS_BLUE_L
 SUDOKU_CELL_UNSELECTED_COLOR :: COLORS_LIGHT1
 SUDOKU_CELL_SOLVED_COLOR :: COLORS_GREEN_L
 SUDOKU_CELL_HIGHLIGHT_CHANGE_COLOR :: COLORS_RED_L
@@ -173,16 +174,21 @@ get_draw_opts :: proc(
 		}
 	}
 
-	switch sel in gameState.uiState.sudokuSel {
-	case SudokuPuzzle.CellCoords:
-		if sel.row == row && sel.col == col do drawOpts.cellColor = SUDOKU_CELL_SELECTED_COLOR
-	case SudokuGame.RowNum:
-		if u8(sel) == row do drawOpts.cellColor = SUDOKU_CELL_SELECTED_COLOR
-	case SudokuGame.ColNum:
-		if u8(sel) == col do drawOpts.cellColor = SUDOKU_CELL_SELECTED_COLOR
-	case SudokuGame.SqrNum:
-		if u8(sel) % 3 == col / 3 && u8(sel) / 3 == row / 3 do drawOpts.cellColor = SUDOKU_CELL_SELECTED_COLOR
-	case:
+	{
+		using gameState.uiState.sudokuSel
+		if coords != {} {
+			switch group {
+			case .None:
+			case .Row:
+				if coords.row == row do drawOpts.cellColor = SUDOKU_GROUP_SELECTED_COLOR
+			case .Col:
+				if coords.col == col do drawOpts.cellColor = SUDOKU_GROUP_SELECTED_COLOR
+			case .Sqr:
+				if coords.row / 3 == row / 3 && coords.col / 3 == col / 3 do drawOpts.cellColor = SUDOKU_GROUP_SELECTED_COLOR
+			case:
+			}
+			if coords.row == row && coords.col == col do drawOpts.cellColor = SUDOKU_CELL_SELECTED_COLOR
+		}
 	}
 
 	for n in 1 ..= 9 {
