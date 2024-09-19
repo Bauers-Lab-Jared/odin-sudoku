@@ -10,11 +10,15 @@ tasks:
       - nix-direnv-reload
     aliases:
       - env
+  git-gud:
+    cmds:
+      - git add --all
   run:
     deps:
       - build
+      - git-gud
     cmds:
-      - nix run .
+      - nix run . --show-trace
     method: none
   debug:
     deps:
@@ -29,14 +33,18 @@ tasks:
       - gdb debug/main -i dap
     method: none
   build:
+    deps:
+      - git-gud
     cmds:
-      - nix build .
+      - nix build . --show-trace
     aliases:
       - b
   build-test:
+    deps:
+      - git-gud
     cmds:
       - odin test src/main/ -out:debug/main -o:none -all-packages
-      - nix run .
+      - nix run . --show-trace
     aliases:
       - test
     method: none
