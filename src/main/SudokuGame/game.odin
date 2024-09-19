@@ -20,7 +20,7 @@ GameState :: struct {
 }
 
 game_init :: proc(gameState: ^GameState) {
-	init_menu(gameState)
+	init_ui(gameState)
 	return
 }
 
@@ -40,6 +40,8 @@ run_game_loop :: proc(using gameState: ^GameState) {
 		inc_puzzle_selection(gameState)
 	case:
 	}
+
+	if .preinit not_in controlFlags do game_handle_input(gameState)
 	return
 }
 

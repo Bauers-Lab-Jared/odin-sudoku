@@ -17,7 +17,7 @@ Menu :: struct {
 
 Button :: struct {
 	text:     string,
-	on_click: proc(_: ^GameState),
+	on_click: proc(gameState: ^GameState),
 	subMenu:  ^Menu,
 }
 

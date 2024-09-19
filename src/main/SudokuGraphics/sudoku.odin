@@ -176,7 +176,7 @@ get_draw_opts :: proc(
 
 	{
 		using gameState.uiState.sudokuSel
-		if coords != {} {
+		if coords.row < 9 && coords.col < 9 {
 			switch group {
 			case .None:
 			case .Row:
