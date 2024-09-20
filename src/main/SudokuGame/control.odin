@@ -249,10 +249,6 @@ selection_jump :: proc(#any_int index: u8, gameState: ^GameState) {
 
 
 selection_modify :: proc(#any_int index: int, gameState: ^GameState) {
-	using gameState.uiState
-	SudokuPuzzle.toggle_possible(
-		&sudokuSel,
-		SudokuPuzzle.CellPossibilities{index + 1},
-		&gameState.workspace,
-	)
+	using gameState
+	SudokuPuzzle.toggle_possible(&uiState.sudokuSel, index + 1, &workspace)
 }

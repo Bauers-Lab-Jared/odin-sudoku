@@ -1,8 +1,12 @@
 package SudokuPuzzle
 
+import "../WaffleLib"
 import "base:runtime"
+import "core:fmt"
 
 SudokuLogicType :: enum {
+	user_add,
+	user_remove,
 	obvious_single,
 	last_possible,
 	obvious_pair,
@@ -23,77 +27,163 @@ SudokuAction :: struct {
 }
 SudokuLog :: [dynamic]SudokuAction
 
-toggle_possible :: proc {
-	toggle_possible_on_sel,
-	toggle_possible_on_group,
-	toggle_possible_on_cell,
+validate_sudoku_action :: proc(action: ^SudokuAction, ws: ^Workspace) -> (ok: bool) {
+	return true
 }
 
-toggle_possible_on_sel :: proc(selection: ^Selection, pos: CellPossibilities, ws: ^Workspace) {
-	targetCells: ^CellGroup
-	targetCell: ^Cell
-
-	switch selection.group {
-	case .Row:
-		targetCells = &ws.rows[selection.coords.row]
-	case .Col:
-		targetCells = &ws.cols[selection.coords.col]
-	case .Sqr:
-		targetCells = &ws.sqrs[selection.coords.col / 3 + (selection.coords.row / 3) * 3]
-	case .None:
-		targetCell = (ws.rows[selection.coords.row])[selection.coords.col]
+take_sudoku_action :: proc(
+	action: ^SudokuAction,
+	ws: ^Workspace,
+) -> (
+	err: runtime.Allocator_Error,
+) {
+	if validate_sudoku_action(action, ws) {
+		WaffleLib.append_doubling(ws.puzzle.log, action^) or_return
+		fmt.printfln("Action!!!")
+		fmt.printfln("%v", action.logic)
+		for change, i in action.changed do fmt.printfln("change %v: %v", i, change)
+		for change in action.changed do if change != {} {
+			ws.puzzle.data[change.row][change.col] = change.refValues[1]
+		}
 	}
-	if targetCells != {} {
-		toggle_possible(targetCells, pos)
-	} else if targetCell != {} {
-		toggle_possible(targetCell, pos)
-	}
+	return nil
 }
 
-toggle_possible_on_group :: proc(group: ^CellGroup, pos: CellPossibilities) {
-	noCellsContain: CellPossibilities = {1, 2, 3, 4, 5, 6, 7, 8, 9}
-	allCellsContain := noCellsContain
-	for cell in group^ do if c, ok := cell^.(CellPossibilities); ok {
-		noCellsContain = noCellsContain - c
-		allCellsContain = allCellsContain & c
-	}
-	togglePos := pos | (allCellsContain + noCellsContain)
-	//    in | mask -> toggle
-	// mix - 1 0 -> 1
-	//       0 0 -> 0
-	// none - 0 1 -> 1
-	// all - 1 1 -> 1
+undo_sudoku_action :: proc(ws: ^Workspace) {
+	if ws.puzzle.log == {} do return
+	if len(ws.puzzle.log) == 0 do return
 
-	for cell in group^ {
-		toggle_possible(cell, togglePos)
+	action: SudokuAction = pop(ws.puzzle.log)
+
+	for change in action.changed do if change != {} {
+		ws.puzzle.data[change.row][change.col] = change.refValues[0]
 	}
 }
 
-toggle_possible_on_cell :: proc(cell: ^Cell, pos: CellPossibilities) {
-	if card(pos) == 0 do return
-
-	switch &c in cell^ {
+cell_add :: proc(cell, diff: Cell) -> Cell {
+	switch d in diff {
 	case CellPossibilities:
-		c = c ~ pos
-	case u16:
-		switch card(pos) {
-		case 0:
-		case 1:
-			if int(c) not_in pos {
-				cell^ = CellPossibilities{int(c)} + pos
+		switch c in cell {
+		case CellPossibilities:
+			return c + d
+		case u16:
+			s := CellPossibilities{int(c)} + d
+			if card(s) > 1 {
+				return s
+			} else {
+				for i in 1 ..= 9 do if i in s do return u16(i)
+				return c
 			}
-		case 2 ..= 9:
-			cell^ = CellPossibilities{int(c)} ~ pos
 		case:
+			return c
+		}
+	case u16:
+		switch c in cell {
+		case CellPossibilities:
+			s := CellPossibilities{int(d)} + c
+			if card(s) > 1 {
+				return s
+			} else {
+				for i in 1 ..= 9 do if i in s do return u16(i)
+				return c
+			}
+		case u16:
+			if c != d {
+				return CellPossibilities{int(c), int(d)}
+			} else {
+				return c
+			}
+		case:
+			return c
 		}
 	case:
+		return cell
+	}
+}
+
+cell_remove :: proc(cell, diff: Cell) -> Cell {
+	#partial switch c in cell {
+	case CellPossibilities:
+		if card(c) == 1 do for i in 1 ..= 9 do if i in c do return u16(i)
+		switch d in diff {
+		case CellPossibilities:
+			if c != d {
+				return c - d
+			} else {
+				for i in 1 ..= 9 do if i in c do return u16(i)
+			}
+		case u16:
+			return c - CellPossibilities{int(d)}
+		case:
+			return c
+		}
+	case:
+		return c
+	}
+	return cell
+}
+
+toggle_possible :: proc(selection: ^Selection, pos: int, ws: ^Workspace) {
+	if pos < 1 || pos > 9 do return
+
+	action: SudokuAction
+
+	if selection.group == .None {
+		set_action_on_cell(coords_to_cell(selection.coords, ws), selection.coords, pos, &action)
+	} else {
+		group := sel_to_group(selection, ws)
+		cellsContain: bool = false
+		for cell in group^ do if c, ok := cell^.(CellPossibilities); ok {
+			cellsContain = cellsContain || pos in c
+		}
+
+		if cellsContain {
+			action.logic = .user_remove
+		} else {
+			action.logic = .user_add
+		}
+
+		for c, i in group^ {
+			set_action_on_cell(c, sel_group_index_to_coords(selection, i), pos, &action)
+		}
 	}
 
-	if c, ok := cell^.(CellPossibilities); ok do switch card(c) {
-	case 0:
-		for i := 9; i >= 1; i -= 1 do if i in pos do cell^ = u16(i)
-	case 1:
-		for i := 9; i >= 1; i -= 1 do if i in c do cell^ = u16(i)
+	take_sudoku_action(&action, ws)
+}
+
+set_action_on_cell :: proc(cell: ^Cell, coords: CellCoords, pos: int, action: ^SudokuAction) {
+	if action.logic == {} do switch c in cell^ {
+	case CellPossibilities:
+		if pos in c {
+			if card(c) > 2 {
+				action.logic = .user_remove
+			} else {
+				return
+			}
+		} else {
+			action.logic = .user_add
+		}
+	case u16:
+		if int(c) != pos {
+			action.logic = .user_add
+		} else {
+			return
+		}
+	case:
+		return
+	}
+
+	for &cref in action.changed {
+		if cref == {} {
+			cref.coords = coords
+			cref.refValues[0] = cell^
+			if action.logic == .user_add {
+				cref.refValues[1] = cell_add(cell^, CellPossibilities{pos})
+			} else {
+				cref.refValues[1] = cell_remove(cell^, CellPossibilities{pos})
+			}
+			return
+		}
 	}
 }
 
