@@ -1,6 +1,5 @@
 package SudokuPuzzle
 
-import "../WaffleLib"
 import "base:runtime"
 
 Cell :: union {
@@ -16,28 +15,6 @@ CellRef :: struct {
 	refValues:    [2]Cell,
 }
 
-SudokuLogicType :: enum {
-	obvious_single,
-	last_possible,
-	obvious_pair,
-	obvious_trio,
-	hidden_single,
-	hidden_pair,
-	hidden_trio,
-	intersect_pin, //pointing pair/trio
-	x_wing,
-	y_wing,
-	swordfish,
-	binary_guess,
-}
-
-SudokuAction :: struct {
-	logic:            SudokuLogicType,
-	changed, inRefTo: [9]CellRef,
-}
-
-SudokuLog :: [dynamic]SudokuAction
-
 CellData :: [9][9]Cell
 CellGroup :: [9]^Cell
 Puzzle :: struct {
@@ -45,26 +22,24 @@ Puzzle :: struct {
 	log:  ^SudokuLog,
 }
 
-SudokuWorkspace :: struct {
+SelectionGroup :: enum {
+	None,
+	Row,
+	Col,
+	Sqr,
+}
+
+Selection :: struct {
+	coords: CellCoords,
+	group:  SelectionGroup,
+}
+
+Workspace :: struct {
 	puzzle:  ^Puzzle,
 	rows:    [9]CellGroup,
 	cols:    [9]CellGroup,
 	sqrs:    [9]CellGroup,
 	scratch: ^SudokuLog,
-}
-
-CellEvalResult :: Cell
-GroupEvalResult :: [9]CellEvalResult
-GroupSetEvalResult :: [9]GroupEvalResult
-AllGroupSetsEvalResult :: struct {
-	rows: [9]GroupEvalResult,
-	cols: [9]GroupEvalResult,
-	sqrs: [9]GroupEvalResult,
-}
-
-PuzzleEvalResult :: union {
-	GroupSetEvalResult,
-	AllGroupSetsEvalResult,
 }
 
 puzzle_init :: proc(puzzle: ^Puzzle) -> ^Puzzle {
@@ -76,7 +51,7 @@ puzzle_init :: proc(puzzle: ^Puzzle) -> ^Puzzle {
 	return puzzle
 }
 
-set_workspace_Puzzle :: proc(workspace: ^SudokuWorkspace, puzzle: ^Puzzle) {
+set_workspace_Puzzle :: proc(workspace: ^Workspace, puzzle: ^Puzzle) {
 	workspace.puzzle = puzzle
 
 	for row in 0 ..= 8 {
@@ -89,23 +64,4 @@ set_workspace_Puzzle :: proc(workspace: ^SudokuWorkspace, puzzle: ^Puzzle) {
 		}
 	}
 	return
-}
-
-check_solved_cell :: proc(c: ^Cell) -> (isSolved: bool) {
-	switch &cell in c^ {
-	case u16:
-		return cell >= 1 && cell <= 9
-	case CellPossibilities:
-		if card(cell) == 1 {
-			for i in 1 ..= 9 {
-				if i in cell {
-					c^ = u16(i)
-					return true
-				}
-			}
-		}
-		return false
-	case:
-		return false
-	}
 }

@@ -30,7 +30,7 @@ Test_Workspace_Pointers :: proc(t: ^testing.T) {
 
 	testPuzzle: Puzzle
 	puzzle_init(&testPuzzle)
-	ws: SudokuWorkspace
+	ws: Workspace
 	set_workspace_Puzzle(&ws, &testPuzzle)
 	i: u16
 	for row in 0 ..= 8 {

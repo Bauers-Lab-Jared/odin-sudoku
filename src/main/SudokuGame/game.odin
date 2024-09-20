@@ -12,7 +12,7 @@ GameStateFlags :: enum {
 GameStateFlags_set :: bit_set[GameStateFlags]
 
 GameState :: struct {
-	workspace:      SudokuPuzzle.SudokuWorkspace,
+	workspace:      SudokuPuzzle.Workspace,
 	uiState:        UIState,
 	controlFlags:   GameStateFlags_set,
 	puzzleStack:    [dynamic]SudokuPuzzle.Puzzle,

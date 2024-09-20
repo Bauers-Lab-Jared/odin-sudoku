@@ -83,7 +83,16 @@ draw_sudoku_window :: proc(gameState: ^SudokuGame.GameState, windowData: ^Window
 	}
 	rl.BeginMode2D(windowData.camera)
 
-	rl.ClearBackground(COLORS_BLUE_D)
+	bgColor: rl.Color
+	switch gameState.uiState.inputMode {
+	case .normal:
+		bgColor = COLORS_BLUE_D
+	case .jump:
+		bgColor = COLORS_GREEN_D
+	case .modify:
+		bgColor = COLORS_RED_D
+	}
+	rl.ClearBackground(bgColor)
 
 	draw_sudoku_puzzle(gameState, windowData)
 
