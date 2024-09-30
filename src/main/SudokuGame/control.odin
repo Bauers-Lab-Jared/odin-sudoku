@@ -36,123 +36,180 @@ init_ui :: proc(gameState: ^GameState, allocator := context.allocator) {
 }
 
 @(private)
-ControlProc :: proc(gameState: ^GameState)
+GameControls :: enum {
+	NONE,
+	MODE_MODIFY,
+	MODE_NORMAL,
+	SELECT_ROWS,
+	SELECT_COLS,
+	SELECT_SQRS,
+	LEFT,
+	RIGHT,
+	UP,
+	DOWN,
+	ZERO,
+	ONE,
+	TWO,
+	THREE,
+	FOUR,
+	FIVE,
+	SIX,
+	SEVEN,
+	EIGHT,
+	NINE,
+	ACCEPT,
+	BACK,
+}
 
 @(private)
-controlMap := map[rl.KeyboardKey]ControlProc {
-	.SPACE = control_space,
-	.ENTER = control_enter,
-	.R     = control_R,
-	.C     = control_C,
-	.S     = control_S,
-	.LEFT  = control_left,
-	.RIGHT = control_right,
-	.UP    = control_up,
-	.DOWN  = control_down,
-	.ZERO  = control_zero,
-	.ONE   = control_one,
-	.TWO   = control_two,
-	.THREE = control_three,
-	.FOUR  = control_four,
-	.FIVE  = control_five,
-	.SIX   = control_six,
-	.SEVEN = control_seven,
-	.EIGHT = control_eight,
-	.NINE  = control_nine,
+controlMap := map[rl.KeyboardKey]GameControls {
+	.SPACE = .ACCEPT,
+	.ENTER = .MODE_MODIFY,
+	.R     = .SELECT_ROWS,
+	.C     = .SELECT_COLS,
+	.S     = .SELECT_SQRS,
+	.LEFT  = .LEFT,
+	.RIGHT = .RIGHT,
+	.UP    = .UP,
+	.DOWN  = .DOWN,
+	.ZERO  = .ZERO,
+	.ONE   = .ONE,
+	.TWO   = .TWO,
+	.THREE = .THREE,
+	.FOUR  = .FOUR,
+	.FIVE  = .FIVE,
+	.SIX   = .SIX,
+	.SEVEN = .SEVEN,
+	.EIGHT = .EIGHT,
+	.NINE  = .NINE,
+	.KP_0  = .ZERO,
+	.KP_1  = .ONE,
+	.KP_2  = .TWO,
+	.KP_3  = .THREE,
+	.KP_4  = .FOUR,
+	.KP_5  = .FIVE,
+	.KP_6  = .SIX,
+	.KP_7  = .SEVEN,
+	.KP_8  = .EIGHT,
+	.KP_9  = .NINE,
 }
 
-game_handle_input :: proc(gameState: ^GameState) {
-	using gameState.uiState
+//		if key != .ONE &&
+//		   key != .TWO &&
+//		   key != .THREE &&
+//		   key != .FOUR &&
+//		   key != .FIVE &&
+//		   key != .SIX &&
+//		   key != .SEVEN &&
+//		   key != .EIGHT &&
+//		   key != .NINE {
+//			switch inputMode {
+//			case .jump:
+//				inputMode = .normal
+//				sudokuSel.group = .None
+//			case .modify:
+//				inputMode = .normal
+//			case .normal:
+//			}
+
+game_handle_input :: proc(using uiState: ^UIState) -> (req: UserAction) {
 	if key := rl.GetKeyPressed(); key != .KEY_NULL {
-		if key != .ONE &&
-		   key != .TWO &&
-		   key != .THREE &&
-		   key != .FOUR &&
-		   key != .FIVE &&
-		   key != .SIX &&
-		   key != .SEVEN &&
-		   key != .EIGHT &&
-		   key != .NINE {
-			switch inputMode {
-			case .jump:
-				inputMode = .normal
-				sudokuSel.group = .None
-			case .modify:
-				inputMode = .normal
-			case .normal:
-				if controlProc := controlMap[key]; controlProc != {} do controlProc(gameState)
+		switch gameControl := controlMap[key]; gameControl {
+		case {}:
+		case .ZERO, .ONE, .TWO, .THREE, .FOUR, .FIVE, .SIX, .SEVEN, .EIGHT, .NINE:
+			n: int
+			#partial switch gameControl {
+			case .NINE:
+				n = 9
+			case .EIGHT:
+				n = 8
+			case .SEVEN:
+				n = 7
+			case .SIX:
+				n = 6
+			case .FIVE:
+				n = 5
+			case .FOUR:
+				n = 4
+			case .THREE:
+				n = 3
+			case .TWO:
+				n = 2
+			case .ONE:
+				n = 1
+			case .ZERO:
+				n = 0
 			}
-		} else {
-			if controlProc := controlMap[key]; controlProc != {} do controlProc(gameState)
+			req = control_number_handler(n, uiState)
+		case .LEFT, .RIGHT, .UP, .DOWN:
+			control_direction_handler(gameControl, uiState)
+		case .ACCEPT:
+		case .MODE_NORMAL:
+			control_set_inputMode(.normal, uiState)
+		case .MODE_MODIFY:
+			control_set_inputMode(.modify, uiState)
+		case .SELECT_ROWS:
+			selection_set_group(.Row, &sudokuSel)
+		case .SELECT_COLS:
+			selection_set_group(.Col, &sudokuSel)
+		case .SELECT_SQRS:
+			selection_set_group(.Sqr, &sudokuSel)
+		case .BACK:
 		}
 	}
+	return req
 }
 
-control_R :: proc(gameState: ^GameState) {
-	using gameState.uiState.sudokuSel
-	if group != .Row {
-		group = .Row
-	} else {
-		group = .None
-	}
-}
-control_C :: proc(gameState: ^GameState) {
-	using gameState.uiState.sudokuSel
-	if group != .Col {
-		group = .Col
-	} else {
-		group = .None
-	}
-}
-control_S :: proc(gameState: ^GameState) {
-	using gameState.uiState.sudokuSel
-	if group != .Sqr {
-		group = .Sqr
-	} else {
-		group = .None
-	}
-}
-
-control_space :: proc(gameState: ^GameState) {
-	using gameState.uiState
-
-	#partial switch inputMode {
+control_number_handler :: proc(#any_int num: u8, using uiState: ^UIState) -> (req: UserAction) {
+	switch inputMode {
 	case .normal:
-		inputMode = .jump
-		sudokuSel.group = .None
+		selection_goto(num, uiState)
+		if num > 0 && sudokuSel.group == .None {
+			inputMode = .jump
+		}
 	case .jump:
+		selection_goto(num, uiState)
 		inputMode = .normal
-		sudokuSel.group = .None
-	}
-}
-
-control_enter :: proc(gameState: ^GameState) {
-	using gameState.uiState
-
-	#partial switch inputMode {
-	case .normal:
-		inputMode = .modify
 	case .modify:
+		req = Action_Toggle(u16(num))
+	case:
+	}
+	return req
+}
+
+control_set_inputMode :: proc(mode: InputMode, using uiState: ^UIState) {
+	if inputMode == mode {
 		inputMode = .normal
+	} else {
+		inputMode = mode
 	}
 }
 
-control_left :: proc(gameState: ^GameState) {
-	selection_move(0, -1, gameState)
-}
-control_right :: proc(gameState: ^GameState) {
-	selection_move(0, 1, gameState)
-}
-control_up :: proc(gameState: ^GameState) {
-	selection_move(-1, 0, gameState)
-}
-control_down :: proc(gameState: ^GameState) {
-	selection_move(1, 0, gameState)
+control_direction_handler :: proc(dir: GameControls, uiState: ^UIState) {
+	#partial switch dir {
+	case .LEFT:
+		selection_move(0, -1, &uiState.sudokuSel)
+	case .RIGHT:
+		selection_move(0, 1, &uiState.sudokuSel)
+	case .UP:
+		selection_move(-1, 0, &uiState.sudokuSel)
+	case .DOWN:
+		selection_move(1, 0, &uiState.sudokuSel)
+	}
 }
 
-selection_move :: proc(#any_int rows, cols: int, gameState: ^GameState) {
-	using gameState.uiState.sudokuSel
+selection_set_group :: proc(
+	grp: SudokuPuzzle.SelectionGroup,
+	using selection: ^SudokuPuzzle.Selection,
+) {
+	if group != grp {
+		group = grp
+	} else {
+		group = .None
+	}
+}
 
+selection_move :: proc(#any_int rows, cols: int, using selection: ^SudokuPuzzle.Selection) {
 	coords.row = u8(int(coords.row + 10) + rows % 10) % 10
 
 	coords.col = u8(int(coords.col + 10) + cols % 10) % 10
@@ -161,94 +218,30 @@ selection_move :: proc(#any_int rows, cols: int, gameState: ^GameState) {
 	if cols != 0 && coords.col < 9 && coords.row > 8 do coords.row = 0
 }
 
-control_zero :: proc(gameState: ^GameState) {
-	using gameState.uiState.sudokuSel
-	group = .None
-	coords = {
-		row = 9,
-		col = 9,
-	}
-}
-control_one :: proc(gameState: ^GameState) {
-	control_number_handler(0, gameState)
-}
-control_two :: proc(gameState: ^GameState) {
-	control_number_handler(1, gameState)
-}
-control_three :: proc(gameState: ^GameState) {
-	control_number_handler(2, gameState)
-}
-control_four :: proc(gameState: ^GameState) {
-	control_number_handler(3, gameState)
-}
-control_five :: proc(gameState: ^GameState) {
-	control_number_handler(4, gameState)
-}
-control_six :: proc(gameState: ^GameState) {
-	control_number_handler(5, gameState)
-}
-control_seven :: proc(gameState: ^GameState) {
-	control_number_handler(6, gameState)
-}
-control_eight :: proc(gameState: ^GameState) {
-	control_number_handler(7, gameState)
-}
-control_nine :: proc(gameState: ^GameState) {
-	control_number_handler(8, gameState)
-}
-
-control_number_handler :: proc(#any_int index: u8, gameState: ^GameState) {
-	using gameState.uiState
-	switch inputMode {
-	case .normal:
-		selection_goto_group(index, gameState)
-	case .jump:
-		selection_jump(index, gameState)
-	case .modify:
-		selection_modify(index, gameState)
-	case:
-	}
-}
-
-selection_goto_group :: proc(#any_int index: u8, gameState: ^GameState) {
-	using gameState.uiState.sudokuSel
-
-	switch group {
-	case .Row:
-		coords.row = index
-		if coords.col == 9 do coords.col = 0
-	case .Col:
-		coords.col = index
-		if coords.row == 9 do coords.row = 0
-	case .Sqr:
-		coords.row = (2 - index / 3) * 3 + 1
-		coords.col = (index % 3) * 3 + 1
-	case .None:
-		coords.row = (2 - index / 3) * 3 + 1
-		coords.col = (index % 3) * 3 + 1
-		group = .Sqr
-		gameState.uiState.inputMode = .jump
-	}
-}
-
-selection_jump :: proc(#any_int index: u8, gameState: ^GameState) {
-	using gameState.uiState.sudokuSel
-	#partial switch group {
-	case .None:
-		coords.row = (2 - index / 3) * 3 + 1
-		coords.col = (index % 3) * 3 + 1
-		group = .Sqr
-	case .Sqr:
-		gameState.uiState.inputMode = .normal
+selection_goto :: proc(#any_int num: u8, using uiState: ^UIState) {
+	using sudokuSel
+	if num == 0 {
 		group = .None
-		selection_move((2 - int(index) / 3) - 1, (int(index) % 3) - 1, gameState)
-	case:
-		gameState.uiState.inputMode = .normal
+		coords = {
+			row = 9,
+			col = 9,
+		}
+	} else {
+		index := num - 1
+		switch group {
+		case .Row:
+			coords.row = index
+			if coords.col == 9 do coords.col = 0
+		case .Col:
+			coords.col = index
+			if coords.row == 9 do coords.row = 0
+		case .Sqr, .None:
+			if inputMode == .jump {
+				selection_move((2 - int(index) / 3) - 1, (int(index) % 3) - 1, &sudokuSel)
+			} else {
+				coords.row = (2 - index / 3) * 3 + 1
+				coords.col = (index % 3) * 3 + 1
+			}
+		}
 	}
-}
-
-
-selection_modify :: proc(#any_int index: int, gameState: ^GameState) {
-	using gameState
-	SudokuPuzzle.toggle_possible(&uiState.sudokuSel, index + 1, &workspace)
 }
