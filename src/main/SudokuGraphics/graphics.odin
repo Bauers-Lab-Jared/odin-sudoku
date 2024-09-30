@@ -78,7 +78,10 @@ draw_sudoku_window :: proc(gameState: ^SudokuGame.GameState, windowData: ^Window
 	windowData.window_size.x = f32(rl.GetScreenWidth())
 	windowData.window_size.y = f32(rl.GetScreenHeight())
 	windowData.camera = rl.Camera2D {
-		offset = rl.Vector2{ui_get_hori_offset(windowData), 0.0},
+		offset = rl.Vector2 {
+			ui_get_hori_offset(windowData, gameState.uiState.currentView == .menu),
+			0.0,
+		},
 		zoom   = min(windowData.window_size.x, windowData.window_size.y) / f32(SCREEN_HEIGHT),
 	}
 	rl.BeginMode2D(windowData.camera)

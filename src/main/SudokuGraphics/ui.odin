@@ -13,8 +13,8 @@ UI_SIDE_BAR_SLIDEOUT :: UI_SIDE_BAR_WIDTH + SUDOKU_CELL_PAD_OUTER
 UI_SIDE_BAR_SLIDEOUT_TRIG_START :: SUDOKU_CELL_SIZE * 3 - UI_SIDE_BAR_SLIDEOUT_TRIG_WIDTH
 UI_SIDE_BAR_SLIDEOUT_TRIG_WIDTH :: SUDOKU_CELL_SIZE / 3
 
-ui_get_hori_offset :: proc(windowData: ^WindowData) -> f32 {
-	if f32(rl.GetMouseX()) > windowData.window_size.x do return 0
+ui_get_hori_offset :: proc(windowData: ^WindowData, forceShowMenu := false) -> (offset: f32) {
+	if !forceShowMenu && f32(rl.GetMouseX()) > windowData.window_size.x do return
 
 	slideout: f32
 	switch {
@@ -31,20 +31,23 @@ ui_get_hori_offset :: proc(windowData: ^WindowData) -> f32 {
 
 
 	if slideout > 0 {
-		return(
-			-slideout *
-			clamp(
-				f32(rl.GetMouseX()) / windowData.camera.zoom -
-				((windowData.window_size.x / 2) / windowData.camera.zoom +
-						UI_SIDE_BAR_SLIDEOUT_TRIG_START),
-				0.0,
-				UI_SIDE_BAR_SLIDEOUT_TRIG_WIDTH,
-			) /
-			UI_SIDE_BAR_SLIDEOUT_TRIG_WIDTH \
-		)
+		if forceShowMenu {
+			offset = -slideout
+		} else {
+			offset =
+				(-slideout *
+					clamp(
+						f32(rl.GetMouseX()) / windowData.camera.zoom -
+						((windowData.window_size.x / 2) / windowData.camera.zoom +
+								UI_SIDE_BAR_SLIDEOUT_TRIG_START),
+						0.0,
+						UI_SIDE_BAR_SLIDEOUT_TRIG_WIDTH,
+					) /
+					UI_SIDE_BAR_SLIDEOUT_TRIG_WIDTH)
+		}
 	}
 
-	return 0
+	return
 }
 
 draw_ui_menu :: proc(gameState: ^SudokuGame.GameState, windowData: ^WindowData) {
@@ -89,6 +92,7 @@ draw_ui_menu :: proc(gameState: ^SudokuGame.GameState, windowData: ^WindowData) 
 	for &butt, i in gameState.uiState.menuState.current.buttons {
 		draw_ui_menu_button(
 			&butt,
+			i,
 			windowData,
 			gameState,
 			rl.Vector2 {
@@ -102,6 +106,7 @@ draw_ui_menu :: proc(gameState: ^SudokuGame.GameState, windowData: ^WindowData) 
 
 draw_ui_menu_button :: proc(
 	butt: ^SudokuGame.Button,
+	#any_int index: u8,
 	windowData: ^WindowData,
 	gameState: ^SudokuGame.GameState,
 	anchor: rl.Vector2,
@@ -111,10 +116,9 @@ draw_ui_menu_button :: proc(
 	if m := (rl.GetMousePosition() - windowData.camera.offset) / windowData.camera.zoom;
 	   WaffleLib.is_inside_rectangle(m, anchor, anchor + size) {
 		color = COLORS_GREEN
-		if rl.IsMouseButtonPressed(.LEFT) {
-			if butt.on_click != nil do butt.on_click(gameState)
-			if butt.subMenu != nil do SudokuGame.subMenu_click(butt.subMenu, gameState)
-		}
+		gameState.uiState.menuState.mouseOverBtn = butt
+	} else if index == gameState.uiState.menuState.current.selected {
+		color = COLORS_GREEN
 	} else {
 		color = COLORS_BLUE_B
 	}

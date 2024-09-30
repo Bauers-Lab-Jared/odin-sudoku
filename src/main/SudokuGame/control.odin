@@ -11,8 +11,8 @@ InputMode :: enum {
 }
 
 ScreenView :: enum {
-	menu,
 	workspace,
+	menu,
 }
 
 UIState :: struct {
@@ -63,38 +63,45 @@ GameControls :: enum {
 
 @(private)
 controlMap := map[rl.KeyboardKey]GameControls {
-	.SPACE = .ACCEPT,
-	.ENTER = .MODE_MODIFY,
-	.R     = .SELECT_ROWS,
-	.C     = .SELECT_COLS,
-	.S     = .SELECT_SQRS,
-	.LEFT  = .LEFT,
-	.RIGHT = .RIGHT,
-	.UP    = .UP,
-	.DOWN  = .DOWN,
-	.ZERO  = .ZERO,
-	.ONE   = .ONE,
-	.TWO   = .TWO,
-	.THREE = .THREE,
-	.FOUR  = .FOUR,
-	.FIVE  = .FIVE,
-	.SIX   = .SIX,
-	.SEVEN = .SEVEN,
-	.EIGHT = .EIGHT,
-	.NINE  = .NINE,
-	.KP_0  = .ZERO,
-	.KP_1  = .ONE,
-	.KP_2  = .TWO,
-	.KP_3  = .THREE,
-	.KP_4  = .FOUR,
-	.KP_5  = .FIVE,
-	.KP_6  = .SIX,
-	.KP_7  = .SEVEN,
-	.KP_8  = .EIGHT,
-	.KP_9  = .NINE,
+	.ENTER     = .ACCEPT,
+	.BACKSPACE = .BACK,
+	.SPACE     = .MODE_MODIFY,
+	.R         = .SELECT_ROWS,
+	.C         = .SELECT_COLS,
+	.S         = .SELECT_SQRS,
+	.LEFT      = .LEFT,
+	.RIGHT     = .RIGHT,
+	.UP        = .UP,
+	.DOWN      = .DOWN,
+	.ZERO      = .ZERO,
+	.ONE       = .ONE,
+	.TWO       = .TWO,
+	.THREE     = .THREE,
+	.FOUR      = .FOUR,
+	.FIVE      = .FIVE,
+	.SIX       = .SIX,
+	.SEVEN     = .SEVEN,
+	.EIGHT     = .EIGHT,
+	.NINE      = .NINE,
+	.KP_0      = .ZERO,
+	.KP_1      = .ONE,
+	.KP_2      = .TWO,
+	.KP_3      = .THREE,
+	.KP_4      = .FOUR,
+	.KP_5      = .FIVE,
+	.KP_6      = .SIX,
+	.KP_7      = .SEVEN,
+	.KP_8      = .EIGHT,
+	.KP_9      = .NINE,
 }
 
 game_handle_input :: proc(using uiState: ^UIState) -> (req: UserAction) {
+	if rl.IsMouseButtonPressed(.LEFT) {
+		req = UserAction {
+			action = .Action_MouseBtn,
+		}
+	}
+
 	if key := rl.GetKeyPressed(); key != .KEY_NULL {
 		switch gameControl := controlMap[key]; gameControl {
 		case {}:
@@ -126,6 +133,7 @@ game_handle_input :: proc(using uiState: ^UIState) -> (req: UserAction) {
 		case .LEFT, .RIGHT, .UP, .DOWN:
 			control_direction_handler(gameControl, uiState)
 		case .ACCEPT:
+			req = control_accept_handler(uiState)
 		case .MODE_NORMAL:
 			control_set_inputMode(.normal, uiState)
 		case .MODE_MODIFY:
@@ -137,9 +145,31 @@ game_handle_input :: proc(using uiState: ^UIState) -> (req: UserAction) {
 		case .SELECT_SQRS:
 			selection_set_group(.Sqr, &sudokuSel)
 		case .BACK:
+			control_back_handler(uiState)
 		}
 	}
 	return req
+}
+
+control_accept_handler :: proc(using uiState: ^UIState) -> (req: UserAction) {
+	if currentView == .workspace {
+		currentView = .menu
+	} else {
+		req = UserAction {
+			action = .Action_MenuBtn,
+		}
+	}
+	return req
+}
+
+control_back_handler :: proc(using uiState: ^UIState) {
+	if currentView == .menu {
+		if menuState.current.superMenu == {} {
+			currentView = .workspace
+		} else {
+			menuState.current = menuState.current.superMenu
+		}
+	}
 }
 
 control_number_handler :: proc(#any_int num: u8, using uiState: ^UIState) -> (req: UserAction) {
@@ -153,7 +183,10 @@ control_number_handler :: proc(#any_int num: u8, using uiState: ^UIState) -> (re
 		selection_goto(num, uiState)
 		inputMode = .normal
 	case .modify:
-		req = Action_Toggle(u16(num))
+		req = UserAction {
+			action = .Action_Toggle,
+			value  = (u16(num)),
+		}
 	case:
 	}
 	return req
@@ -167,16 +200,36 @@ control_set_inputMode :: proc(mode: InputMode, using uiState: ^UIState) {
 	}
 }
 
-control_direction_handler :: proc(dir: GameControls, uiState: ^UIState) {
-	#partial switch dir {
-	case .LEFT:
-		selection_move(0, -1, &uiState.sudokuSel)
-	case .RIGHT:
-		selection_move(0, 1, &uiState.sudokuSel)
-	case .UP:
-		selection_move(-1, 0, &uiState.sudokuSel)
-	case .DOWN:
-		selection_move(1, 0, &uiState.sudokuSel)
+control_direction_handler :: proc(dir: GameControls, using uiState: ^UIState) {
+	if currentView == .workspace {
+		#partial switch dir {
+		case .LEFT:
+			selection_move(0, -1, &sudokuSel)
+		case .RIGHT:
+			selection_move(0, 1, &sudokuSel)
+		case .UP:
+			selection_move(-1, 0, &sudokuSel)
+		case .DOWN:
+			selection_move(1, 0, &sudokuSel)
+		}
+	} else if currentView == .menu {
+		#partial switch dir {
+		case .LEFT:
+			control_back_handler(uiState)
+		case .RIGHT:
+		case .UP:
+			menuState.current.selected = clamp(
+				menuState.current.selected - 1,
+				0,
+				u8(len(menuState.current.buttons)) - 1,
+			)
+		case .DOWN:
+			menuState.current.selected = clamp(
+				menuState.current.selected + 1,
+				0,
+				u8(len(menuState.current.buttons)) - 1,
+			)
+		}
 	}
 }
 

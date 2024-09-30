@@ -3,9 +3,10 @@ package SudokuGame
 import "../SudokuPuzzle"
 
 MenuState :: struct {
-	menuList: [dynamic]^Menu,
-	current:  ^Menu,
-	top:      ^Menu,
+	menuList:     [dynamic]^Menu,
+	current:      ^Menu,
+	top:          ^Menu,
+	mouseOverBtn: ^Button,
 }
 
 Menu :: struct {
@@ -38,7 +39,22 @@ init_menu :: proc(gameState: ^GameState, allocator := context.allocator) {
 	append(&top.buttons, Button{text = "Quit", on_click = game_quit})
 }
 
-subMenu_click :: proc(subMenu: ^Menu, gameState: ^GameState) {
-	subMenu.superMenu = gameState.uiState.menuState.current
-	gameState.uiState.menuState.current = subMenu
+btn_on_click :: proc(gameState: ^GameState, btn: ^Button = {}) {
+	using gameState.uiState.menuState
+	button: ^Button
+	if btn == {} {
+		button = &current.buttons[current.selected]
+	} else {
+		button = btn
+	}
+	if button.subMenu != {} {
+		subMenu_click(&button.subMenu^, &gameState.uiState.menuState)
+	} else {
+		button.on_click(gameState)
+	}
+}
+
+subMenu_click :: proc(subMenu: ^Menu, using menuState: ^MenuState) {
+	subMenu.superMenu = current
+	current = subMenu
 }

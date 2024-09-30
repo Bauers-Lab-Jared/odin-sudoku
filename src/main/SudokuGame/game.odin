@@ -19,11 +19,17 @@ GameState :: struct {
 	selectedPuzzle: int,
 }
 
-UserAction :: union {
-	Action_Toggle,
+UserAction :: struct {
+	value:  SudokuPuzzle.Cell,
+	action: UserActions,
 }
 
-Action_Toggle :: SudokuPuzzle.Cell
+UserActions :: enum {
+	None,
+	Action_MenuBtn,
+	Action_MouseBtn,
+	Action_Toggle,
+}
 
 game_init :: proc(gameState: ^GameState) {
 	init_ui(gameState)
@@ -31,7 +37,17 @@ game_init :: proc(gameState: ^GameState) {
 }
 
 run_game_loop :: proc(using gameState: ^GameState) {
-	game_handle_input(&gameState.uiState)
+	userAction := game_handle_input(&gameState.uiState)
+	switch userAction.action {
+	case {}:
+	case .Action_MenuBtn:
+		btn_on_click(gameState)
+	case .Action_MouseBtn:
+		if uiState.menuState.mouseOverBtn != {} {
+			btn_on_click(gameState, uiState.menuState.mouseOverBtn)
+		}
+	case .Action_Toggle:
+	}
 
 	switch {
 	case .quitting in controlFlags:
@@ -45,11 +61,19 @@ run_game_loop :: proc(using gameState: ^GameState) {
 		}
 		controlFlags -= {.start_new}
 	case .preinit in controlFlags:
+		uiState.inputMode = .normal
+		uiState.sudokuSel.group = .None
+		uiState.sudokuSel.coords = {
+			row = 9,
+			col = 9,
+		}
 		inc_puzzle_selection(gameState)
 	case:
 	}
+}
 
-	return
+cleanup_game_loop :: proc(using GameState: ^GameState) {
+	uiState.menuState.mouseOverBtn = {}
 }
 
 @(private)
