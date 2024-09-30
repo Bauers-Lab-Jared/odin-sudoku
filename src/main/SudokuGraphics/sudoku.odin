@@ -117,7 +117,7 @@ draw_sudoku_cell :: proc(cell: ^SudokuPuzzle.Cell, drawOpts: ^DrawOpts) {
 	case SudokuPuzzle.CellPossibilities:
 		for row in 1 ..= 3 {
 			for col in 1 ..= 3 {
-				pos: int = row + (col - 1) * 3
+				pos: int = col + (3 - row) * 3
 				if pos in c {
 					draw(drawOpts, strconv.itoa(buf[:], pos), pos - 1, row, col, FONT_SIZE)
 				}
