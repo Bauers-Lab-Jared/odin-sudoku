@@ -94,24 +94,6 @@ controlMap := map[rl.KeyboardKey]GameControls {
 	.KP_9  = .NINE,
 }
 
-//		if key != .ONE &&
-//		   key != .TWO &&
-//		   key != .THREE &&
-//		   key != .FOUR &&
-//		   key != .FIVE &&
-//		   key != .SIX &&
-//		   key != .SEVEN &&
-//		   key != .EIGHT &&
-//		   key != .NINE {
-//			switch inputMode {
-//			case .jump:
-//				inputMode = .normal
-//				sudokuSel.group = .None
-//			case .modify:
-//				inputMode = .normal
-//			case .normal:
-//			}
-
 game_handle_input :: proc(using uiState: ^UIState) -> (req: UserAction) {
 	if key := rl.GetKeyPressed(); key != .KEY_NULL {
 		switch gameControl := controlMap[key]; gameControl {
