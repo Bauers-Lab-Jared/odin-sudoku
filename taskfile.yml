@@ -42,18 +42,18 @@ tasks:
   build-test:
     deps:
       - git-gud
+      - mkdir-debug
     cmds:
       - odin test src/main/ -out:debug/main -o:none -all-packages
-      - nix run . --show-trace
+      #- nix run . --show-trace
     aliases:
       - test
     method: none
   mkdir-debug:
-    precondition: "[ ! -e debug ]"
     sources:
       - "debug/"
     cmds:
-      - mkdir debug
+      - mkdir -p debug
     internal: true
   build-debug:
     deps:
