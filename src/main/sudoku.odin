@@ -1,7 +1,5 @@
-package SudokuGraphics
+package SudokuSolver
 
-import "../SudokuGame"
-import "../SudokuPuzzle"
 import "core:strconv"
 import "core:strings"
 import rl "vendor:raylib"
@@ -20,7 +18,7 @@ SUDOKU_CELL_SOLVED_COLOR :: COLORS_GREEN_L
 SUDOKU_CELL_HIGHLIGHT_CHANGE_COLOR :: COLORS_RED_L
 SUDOKU_CELL_HIGHLIGHT_REF_COLOR :: COLORS_YELLOW_L
 
-draw_sudoku_puzzle :: proc(gameState: ^SudokuGame.GameState, windowData: ^WindowData) {
+draw_sudoku_puzzle :: proc(gameState: ^GameState, windowData: ^WindowData) {
 	anchor: [2]f32
 	anchor.x =
 		(windowData.window_size.x / (2.0 * windowData.camera.zoom)) -
@@ -70,8 +68,7 @@ DrawOpts :: struct {
 }
 
 @(private)
-draw_sudoku_cell :: proc(cell: ^SudokuPuzzle.Cell, drawOpts: ^DrawOpts) {
-	using SudokuPuzzle
+draw_sudoku_cell :: proc(cell: ^Cell, drawOpts: ^DrawOpts) {
 	FONT_SIZE :: (SUDOKU_CELL_SIZE) / 3.0
 	FONT_SIZE_SOLVED :: SUDOKU_CELL_SIZE
 	CHAR_ASPECT_V :: 0.46
@@ -114,7 +111,7 @@ draw_sudoku_cell :: proc(cell: ^SudokuPuzzle.Cell, drawOpts: ^DrawOpts) {
 		case:
 			draw(drawOpts, "?")
 		}
-	case SudokuPuzzle.CellPossibilities:
+	case CellPossibilities:
 		for row in 1 ..= 3 {
 			for col in 1 ..= 3 {
 				pos: int = col + (3 - row) * 3
@@ -132,7 +129,7 @@ draw_sudoku_cell :: proc(cell: ^SudokuPuzzle.Cell, drawOpts: ^DrawOpts) {
 get_draw_opts :: proc(
 	#any_int row, col: u8,
 	anchor: [2]f32,
-	gameState: ^SudokuGame.GameState,
+	gameState: ^GameState,
 	windowData: ^WindowData,
 ) -> (
 	drawOpts: DrawOpts,
@@ -140,11 +137,11 @@ get_draw_opts :: proc(
 	drawOpts.anchor = anchor
 	drawOpts.font = windowData.font
 
-	removedPossibilities: SudokuPuzzle.CellPossibilities
-	refPossibilities: SudokuPuzzle.CellPossibilities
+	removedPossibilities: CellPossibilities
+	refPossibilities: CellPossibilities
 
 	switch c in gameState.workspace.puzzle.data[row][col] {
-	case SudokuPuzzle.CellPossibilities:
+	case CellPossibilities:
 		drawOpts.cellColor = SUDOKU_CELL_UNSELECTED_COLOR
 	case u16:
 		drawOpts.cellColor = SUDOKU_CELL_SOLVED_COLOR
@@ -157,7 +154,7 @@ get_draw_opts :: proc(
 
 		if refCell.row == row && refCell.col == col {
 			drawOpts.cellColor = SUDOKU_CELL_HIGHLIGHT_REF_COLOR
-			if p, ok := refCell.refValues.x.(SudokuPuzzle.CellPossibilities); ok {
+			if p, ok := refCell.refValues.x.(CellPossibilities); ok {
 				refPossibilities = p
 			}
 		}
@@ -168,7 +165,7 @@ get_draw_opts :: proc(
 
 		if changedCell.row == row && changedCell.col == col {
 			drawOpts.cellColor = SUDOKU_CELL_HIGHLIGHT_CHANGE_COLOR
-			if p, ok := changedCell.refValues.x.(SudokuPuzzle.CellPossibilities); ok {
+			if p, ok := changedCell.refValues.x.(CellPossibilities); ok {
 				removedPossibilities = p
 			}
 		}

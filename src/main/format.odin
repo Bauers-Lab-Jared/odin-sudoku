@@ -1,6 +1,5 @@
-package SudokuFormat
+package SudokuSolver
 
-import "../SudokuPuzzle"
 import "base:runtime"
 import "core:fmt"
 import "core:io"
@@ -8,13 +7,12 @@ import "core:strconv"
 import "core:strings"
 
 make_puzzle_format_builder :: proc(
-	puzzle: ^SudokuPuzzle.Puzzle,
+	puzzle: ^Puzzle,
 	builder: ^strings.Builder,
 	allocator := context.allocator,
 ) -> (
 	err: runtime.Allocator_Error,
 ) {
-	using SudokuPuzzle
 	puzzleStringTemplate := `
      . . . | . . . | . . . 
      . . . | . . . | . . . 
@@ -57,13 +55,12 @@ make_puzzle_format_builder :: proc(
 }
 
 make_puzzle_format_builder_full :: proc(
-	puzzle: ^SudokuPuzzle.Puzzle,
+	puzzle: ^Puzzle,
 	builder: ^strings.Builder,
 	allocator := context.allocator,
 ) -> (
 	err: runtime.Allocator_Error,
 ) {
-	using SudokuPuzzle
 
 	emptySpace :: " "
 	ruledOut :: "."

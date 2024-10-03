@@ -1,4 +1,4 @@
-package SudokuPuzzle
+package SudokuSolver
 
 import "../WaffleLib"
 import "base:runtime"

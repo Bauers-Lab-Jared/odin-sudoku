@@ -1,4 +1,4 @@
-package SudokuPuzzle
+package SudokuSolver
 
 import "base:runtime"
 

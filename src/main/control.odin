@@ -1,6 +1,5 @@
-package SudokuGame
+package SudokuSolver
 
-import "../SudokuPuzzle"
 import "core:fmt"
 import rl "vendor:raylib"
 
@@ -16,8 +15,8 @@ ScreenView :: enum {
 }
 
 UIState :: struct {
-	sudokuSel:       SudokuPuzzle.Selection,
-	highlightAction: SudokuPuzzle.SudokuAction,
+	sudokuSel:       Selection,
+	highlightAction: SudokuAction,
 	inputMode:       InputMode,
 	currentView:     ScreenView,
 	menuState:       MenuState,
@@ -233,10 +232,7 @@ control_direction_handler :: proc(dir: GameControls, using uiState: ^UIState) {
 	}
 }
 
-selection_set_group :: proc(
-	grp: SudokuPuzzle.SelectionGroup,
-	using selection: ^SudokuPuzzle.Selection,
-) {
+selection_set_group :: proc(grp: SelectionGroup, using selection: ^Selection) {
 	if group != grp {
 		group = grp
 	} else {
@@ -244,7 +240,7 @@ selection_set_group :: proc(
 	}
 }
 
-selection_move :: proc(#any_int rows, cols: int, using selection: ^SudokuPuzzle.Selection) {
+selection_move :: proc(#any_int rows, cols: int, using selection: ^Selection) {
 	coords.row = u8(int(coords.row + 10) + rows % 10) % 10
 
 	coords.col = u8(int(coords.col + 10) + cols % 10) % 10

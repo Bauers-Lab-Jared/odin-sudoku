@@ -1,6 +1,4 @@
-package SudokuGame
-
-import "../SudokuPuzzle"
+package SudokuSolver
 
 MenuState :: struct {
 	menuList:     [dynamic]^Menu,

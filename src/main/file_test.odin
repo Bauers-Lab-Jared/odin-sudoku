@@ -1,13 +1,11 @@
-package SudokuFile
+package SudokuSolver
 
-import "../SudokuPuzzle "
 import "core:fmt"
 import "core:strings"
 import "core:testing"
 
 @(test)
 test_read_sudoku_file :: proc(t: ^testing.T) {
-	using SudokuPuzzle
 	testFile :: "test-files/test-puzzles01"
 	dummyFile := `
 ...6928......74..1..5.8.......4.1...6...5.2.....7...6......6..52.4...61.59.....4.
@@ -42,7 +40,7 @@ test_read_sudoku_file :: proc(t: ^testing.T) {
 ..94....1.6..95...2....7.95...2.............47.1..9...6......1.4.5.2.....1.8.42.7
     `
 
-	pBuff, allocErr := make([dynamic]SudokuPuzzle.Puzzle, 0, 32)
+	pBuff, allocErr := make([dynamic]Puzzle, 0, 32)
 	defer delete(pBuff)
 
 	nPuzzles, nLines, err := read_sudoku_file(testFile, &pBuff)

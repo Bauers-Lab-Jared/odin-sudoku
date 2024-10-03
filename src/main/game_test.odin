@@ -1,4 +1,4 @@
-package SudokuGame
+package SudokuSolver
 
 import "core:fmt"
 import "core:testing"

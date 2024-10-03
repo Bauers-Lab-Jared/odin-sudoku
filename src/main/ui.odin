@@ -1,6 +1,5 @@
-package SudokuGraphics
+package SudokuSolver
 
-import "../SudokuGame"
 import "../WaffleLib"
 import "core:fmt"
 import "core:math"
@@ -50,7 +49,7 @@ ui_get_hori_offset :: proc(windowData: ^WindowData, forceShowMenu := false) -> (
 	return
 }
 
-draw_ui_menu :: proc(gameState: ^SudokuGame.GameState, windowData: ^WindowData) {
+draw_ui_menu :: proc(gameState: ^GameState, windowData: ^WindowData) {
 	anchor: rl.Vector2
 	anchor.x = windowData.window_size.x / (2.0 * windowData.camera.zoom) + SCREEN_HEIGHT / 2
 	anchor.y =
@@ -105,10 +104,10 @@ draw_ui_menu :: proc(gameState: ^SudokuGame.GameState, windowData: ^WindowData) 
 }
 
 draw_ui_menu_button :: proc(
-	butt: ^SudokuGame.Button,
+	butt: ^Button,
 	#any_int index: u8,
 	windowData: ^WindowData,
-	gameState: ^SudokuGame.GameState,
+	gameState: ^GameState,
 	anchor: rl.Vector2,
 	size: rl.Vector2,
 ) {

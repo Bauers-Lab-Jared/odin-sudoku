@@ -1,7 +1,5 @@
-package SudokuGame
+package SudokuSolver
 
-import "../SudokuFile"
-import "../SudokuPuzzle"
 
 GameStateFlags :: enum {
 	preinit,
@@ -12,15 +10,15 @@ GameStateFlags :: enum {
 GameStateFlags_set :: bit_set[GameStateFlags]
 
 GameState :: struct {
-	workspace:      SudokuPuzzle.Workspace,
+	workspace:      Workspace,
 	uiState:        UIState,
 	controlFlags:   GameStateFlags_set,
-	puzzleStack:    [dynamic]SudokuPuzzle.Puzzle,
+	puzzleStack:    [dynamic]Puzzle,
 	selectedPuzzle: int,
 }
 
 UserAction :: struct {
-	value:  SudokuPuzzle.Cell,
+	value:  Cell,
 	action: UserActions,
 }
 
@@ -47,6 +45,8 @@ run_game_loop :: proc(using gameState: ^GameState) {
 			btn_on_click(gameState, uiState.menuState.mouseOverBtn)
 		}
 	case .Action_Toggle:
+	//request sudoku action for user_add or user_remove
+	//then commit that action to the puzzle in the workspace
 	}
 
 	switch {
@@ -83,7 +83,7 @@ inc_puzzle_selection :: proc(using gameState: ^GameState) {
 	} else {
 		selectedPuzzle += 1
 	}
-	SudokuPuzzle.set_workspace_Puzzle(&workspace, &puzzleStack[selectedPuzzle])
+	set_workspace_Puzzle(&workspace, &puzzleStack[selectedPuzzle])
 }
 
 @(private)
@@ -93,7 +93,7 @@ set_puzzle_selection :: proc(using gameState: ^GameState, #any_int select: int) 
 	} else {
 		selectedPuzzle = 0
 	}
-	SudokuPuzzle.set_workspace_Puzzle(&workspace, &puzzleStack[selectedPuzzle])
+	set_workspace_Puzzle(&workspace, &puzzleStack[selectedPuzzle])
 }
 
 game_quit :: proc(gameState: ^GameState) {
