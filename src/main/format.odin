@@ -31,7 +31,7 @@ make_puzzle_format_builder :: proc(
 	cellIndex: int
 	for char in puzzleStringTemplate {
 		if char == '.' {
-			cell, cell_solved := puzzle^.data[cellIndex / 9][cellIndex % 9].(u16)
+			cell, cell_solved := puzzle^[cellIndex / 9][cellIndex % 9].(u16)
 			if cellIndex < 81 {
 				if cell_solved {
 					if cell >= 1 && cell <= 9 {
@@ -93,7 +93,7 @@ make_puzzle_format_builder_full :: proc(
 		buf = strings.builder_make(0, lineLength, allocator) or_return
 	}
 
-	for &row, rowIndex in puzzle^.data {
+	for &row, rowIndex in puzzle^ {
 		switch rowIndex {
 		case 0:
 		case 3, 6:

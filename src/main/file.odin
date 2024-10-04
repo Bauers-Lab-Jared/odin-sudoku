@@ -1,6 +1,6 @@
 package SudokuSolver
 
-import "../WaffleLib"
+import "WaffleLib"
 import "base:runtime"
 import "core:fmt"
 import "core:os"
@@ -50,9 +50,9 @@ parse_sudoku_line :: proc(puzzle: ^Puzzle, inputLine: string) -> (err: ParseErro
 	for c, i in inputLine {
 		switch c {
 		case '.':
-			puzzle.data[i / 9][i % 9] = CellPossibilities{1, 2, 3, 4, 5, 6, 7, 8, 9}
+			puzzle[i / 9][i % 9] = CellPossibilities{1, 2, 3, 4, 5, 6, 7, 8, 9}
 		case '1' ..= '9':
-			puzzle.data[i / 9][i % 9] = cast(u16)c - '0'
+			puzzle[i / 9][i % 9] = cast(u16)c - '0'
 		case:
 			puzzle_init(puzzle)
 			return ParseError.UnexpectedChar

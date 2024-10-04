@@ -1,6 +1,6 @@
 package SudokuSolver
 
-import "../WaffleLib"
+import "WaffleLib"
 import "core:fmt"
 import "core:math"
 import "core:strconv"

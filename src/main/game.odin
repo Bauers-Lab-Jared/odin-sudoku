@@ -83,7 +83,7 @@ inc_puzzle_selection :: proc(using gameState: ^GameState) {
 	} else {
 		selectedPuzzle += 1
 	}
-	set_workspace_Puzzle(&workspace, &puzzleStack[selectedPuzzle])
+	ws_set_puzzle(&workspace, &puzzleStack[selectedPuzzle])
 }
 
 @(private)
@@ -93,7 +93,7 @@ set_puzzle_selection :: proc(using gameState: ^GameState, #any_int select: int) 
 	} else {
 		selectedPuzzle = 0
 	}
-	set_workspace_Puzzle(&workspace, &puzzleStack[selectedPuzzle])
+	ws_set_puzzle(&workspace, &puzzleStack[selectedPuzzle])
 }
 
 game_quit :: proc(gameState: ^GameState) {

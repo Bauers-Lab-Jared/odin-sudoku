@@ -81,7 +81,7 @@ test_format_puzzle_str_full :: proc(t: ^testing.T) {
 
 	puzzle: Puzzle
 	parse_sudoku_line(&puzzle, puzzleDef)
-	switch &c in puzzle.data[0][0] {
+	switch &c in puzzle[0][0] {
 	case u16:
 	case CellPossibilities:
 		c -= CellPossibilities{6, 9, 2, 8}

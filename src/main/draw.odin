@@ -31,7 +31,7 @@ draw_sudoku_puzzle :: proc(gameState: ^GameState, windowData: ^WindowData) {
 
 	drawOpts: DrawOpts
 
-	for row, r in gameState.workspace.puzzle.data {
+	for row, r in gameState.workspace.puzzle {
 		for &cell, c in row {
 			drawOpts = get_draw_opts(
 				r,
@@ -140,7 +140,7 @@ get_draw_opts :: proc(
 	removedPossibilities: CellPossibilities
 	refPossibilities: CellPossibilities
 
-	switch c in gameState.workspace.puzzle.data[row][col] {
+	switch c in gameState.workspace.puzzle[row][col] {
 	case CellPossibilities:
 		drawOpts.cellColor = SUDOKU_CELL_UNSELECTED_COLOR
 	case u16:

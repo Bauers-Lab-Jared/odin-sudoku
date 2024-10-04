@@ -1,5 +1,6 @@
 package SudokuSolver
 
+import "WaffleLib"
 import "core:fmt"
 import "core:strings"
 import "core:testing"
@@ -78,7 +79,7 @@ test_read_sudoku_file :: proc(t: ^testing.T) {
 			case:
 				fmt.panicf("dummyFile had unexpected character at %v:%v, '%v'", ln + 1, i + 1, c)
 			}
-			actual := pBuff[ln].data[i / 9][i % 9]
+			actual := pBuff[ln][i / 9][i % 9]
 
 			testing.expect(
 				t,

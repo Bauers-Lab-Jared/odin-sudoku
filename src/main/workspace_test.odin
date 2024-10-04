@@ -13,12 +13,12 @@ Test_Puzzle_Init :: proc(t: ^testing.T) {
 		for col in 0 ..= 8 {
 			testing.expectf(
 				t,
-				testPuzzle.data[row][col] == CellPossibilities{1, 2, 3, 4, 5, 6, 7, 8, 9},
+				testPuzzle[row][col] == CellPossibilities{1, 2, 3, 4, 5, 6, 7, 8, 9},
 				`Freshly initialized puzzle expected to contain all possibilities.
         Cell[%v][%v]=%v`,
 				row,
 				col,
-				testPuzzle.data[row][col],
+				testPuzzle[row][col],
 			)
 		}
 	}
@@ -31,11 +31,11 @@ Test_Workspace_Pointers :: proc(t: ^testing.T) {
 	testPuzzle: Puzzle
 	puzzle_init(&testPuzzle)
 	ws: Workspace
-	set_workspace_Puzzle(&ws, &testPuzzle)
+	ws_set_puzzle(&ws, &testPuzzle)
 	i: u16
 	for row in 0 ..= 8 {
 		for col in 0 ..= 8 {
-			testPuzzle.data[row][col] = i
+			testPuzzle[row][col] = i
 
 			testing.expectf(
 				t,
@@ -44,7 +44,7 @@ Test_Workspace_Pointers :: proc(t: ^testing.T) {
 				row,
 				col,
 				ws.rows[row][col]^,
-				testPuzzle.data[row][col],
+				testPuzzle[row][col],
 			)
 
 			testing.expectf(
@@ -54,7 +54,7 @@ Test_Workspace_Pointers :: proc(t: ^testing.T) {
 				col,
 				row,
 				ws.cols[col][row]^,
-				testPuzzle.data[row][col],
+				testPuzzle[row][col],
 			)
 
 			testing.expectf(
@@ -64,7 +64,7 @@ Test_Workspace_Pointers :: proc(t: ^testing.T) {
 				(col / 3) % 3 + 3 * (row / 3 % 3),
 				col % 3 + 3 * (row % 3),
 				ws.sqrs[(col / 3) % 3 + 3 * (row / 3 % 3)][col % 3 + 3 * (row % 3)]^,
-				testPuzzle.data[row][col],
+				testPuzzle[row][col],
 			)
 
 			i += 1
@@ -78,8 +78,8 @@ Test_Check_Solved_Cells :: proc(t: ^testing.T = {}) {
 	puzzle_init(&testPuzzle)
 	lut: [9][9]Cell
 
-	testPuzzle.data[0] = {{}, {}, {}, {}, {}, {}, {}, {}, {}}
-	testPuzzle.data[1] = {
+	testPuzzle[0] = {{}, {}, {}, {}, {}, {}, {}, {}, {}}
+	testPuzzle[1] = {
 		CellPossibilities{1},
 		CellPossibilities{2},
 		CellPossibilities{3},
@@ -90,7 +90,7 @@ Test_Check_Solved_Cells :: proc(t: ^testing.T = {}) {
 		CellPossibilities{8},
 		CellPossibilities{9},
 	}
-	testPuzzle.data[2] = {
+	testPuzzle[2] = {
 		CellPossibilities{1, 2},
 		CellPossibilities{2, 3},
 		CellPossibilities{3, 4},
@@ -101,7 +101,7 @@ Test_Check_Solved_Cells :: proc(t: ^testing.T = {}) {
 		CellPossibilities{8, 9},
 		CellPossibilities{9},
 	}
-	testPuzzle.data[3] = {
+	testPuzzle[3] = {
 		CellPossibilities{1, 2, 3},
 		CellPossibilities{2, 3, 4},
 		CellPossibilities{3, 4, 5},
@@ -112,7 +112,7 @@ Test_Check_Solved_Cells :: proc(t: ^testing.T = {}) {
 		CellPossibilities{8, 9},
 		CellPossibilities{9},
 	}
-	testPuzzle.data[4] = {
+	testPuzzle[4] = {
 		CellPossibilities{1, 2, 3, 4},
 		CellPossibilities{2, 3, 4, 5},
 		CellPossibilities{3, 4, 5, 6},
@@ -123,7 +123,7 @@ Test_Check_Solved_Cells :: proc(t: ^testing.T = {}) {
 		CellPossibilities{8, 9},
 		CellPossibilities{9},
 	}
-	testPuzzle.data[5] = {
+	testPuzzle[5] = {
 		CellPossibilities{1, 2, 3, 4, 5},
 		CellPossibilities{2, 3, 4, 5, 6},
 		CellPossibilities{3, 4, 5, 6, 7},
@@ -134,7 +134,7 @@ Test_Check_Solved_Cells :: proc(t: ^testing.T = {}) {
 		CellPossibilities{8, 9},
 		CellPossibilities{9},
 	}
-	testPuzzle.data[6] = {
+	testPuzzle[6] = {
 		CellPossibilities{1, 2, 3, 4, 5, 6},
 		CellPossibilities{2, 3, 4, 5, 6, 7},
 		CellPossibilities{3, 4, 5, 6, 7, 8},
@@ -145,7 +145,7 @@ Test_Check_Solved_Cells :: proc(t: ^testing.T = {}) {
 		CellPossibilities{8, 9},
 		CellPossibilities{9},
 	}
-	testPuzzle.data[7] = {
+	testPuzzle[7] = {
 		CellPossibilities{1, 2, 3, 4, 5, 6, 7},
 		CellPossibilities{2, 3, 4, 5, 6, 7, 8},
 		CellPossibilities{3, 4, 5, 6, 7, 8, 9},
@@ -156,7 +156,7 @@ Test_Check_Solved_Cells :: proc(t: ^testing.T = {}) {
 		CellPossibilities{8, 9},
 		CellPossibilities{9},
 	}
-	testPuzzle.data[8] = {
+	testPuzzle[8] = {
 		CellPossibilities{1, 2, 3, 4, 5, 6, 7, 8},
 		CellPossibilities{2, 3, 4, 5, 6, 7, 8, 9},
 		CellPossibilities{3, 4, 5, 6, 7, 8, 9},
@@ -180,18 +180,12 @@ Test_Check_Solved_Cells :: proc(t: ^testing.T = {}) {
 
 	for x in 0 ..< 9 {
 		for y in 0 ..< 9 {
-			isSolved := check_solved_cell(&testPuzzle.data[x][y])
-			expectlut := lut[x][y] != nil ? lut[x][y] : testPuzzle.data[x][y]
+			isSolved := cell_check_solved(&testPuzzle[x][y])
+			expectlut := lut[x][y] != nil ? lut[x][y] : testPuzzle[x][y]
 			testing.expect(
 				t,
-				testPuzzle.data[x][y] == expectlut,
-				fmt.tprintf(
-					"Expected [%v][%v] = %v; got %v",
-					x,
-					y,
-					expectlut,
-					testPuzzle.data[x][y],
-				),
+				testPuzzle[x][y] == expectlut,
+				fmt.tprintf("Expected [%v][%v] = %v; got %v", x, y, expectlut, testPuzzle[x][y]),
 			)
 
 			expect: bool

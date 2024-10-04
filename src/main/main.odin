@@ -22,7 +22,7 @@ main :: proc() {
 		&gameState.puzzleStack,
 	)
 	if len(gameState.puzzleStack) < 1 do append_elem(&gameState.puzzleStack, puzzle_init(new(Puzzle))^)
-	set_workspace_Puzzle(&gameState.workspace, &gameState.puzzleStack[0])
+	ws_set_puzzle(&gameState.workspace, &gameState.puzzleStack[0])
 
 	//	make_puzzle_format_builder_full(&puzzles[selectedPuzzle], &printBuilder)
 	//	fmt.println(strings.to_string(printBuilder))
