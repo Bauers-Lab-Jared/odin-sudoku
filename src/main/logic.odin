@@ -4,8 +4,30 @@ import "WaffleLib"
 import "base:runtime"
 import "core:fmt"
 
-sel_toggle_possible :: proc(selection: ^Selection, pos: int, ws: ^Workspace) {
-	if pos < 1 || pos > 9 do return
+sel_set_possible :: proc(
+	selection: ^Selection,
+	#any_int poss: int,
+	ws: ^Workspace,
+	set: bool = false,
+) {
+	if poss < 1 || poss > 9 do return
+	action: SudokuAction = {.user_add if set else .user_remove, {}, {}}
+	if selection.group == .None {
+		set_action_on_cell(
+			ws_get_cell_at_coords(ws, selection.coords),
+			selection.coords,
+			poss,
+			&action,
+		)
+	} else {
+		group := ws_select_group(ws, selection)
+		set_action_on_group(group, poss, &action, selection)
+	}
+	ws_take_action(ws, &action)
+}
+
+sel_toggle_possible :: proc(selection: ^Selection, #any_int poss: int, ws: ^Workspace) {
+	if poss < 1 || poss > 9 do return
 
 	action: SudokuAction
 
@@ -13,35 +35,44 @@ sel_toggle_possible :: proc(selection: ^Selection, pos: int, ws: ^Workspace) {
 		set_action_on_cell(
 			ws_get_cell_at_coords(ws, selection.coords),
 			selection.coords,
-			pos,
+			poss,
 			&action,
 		)
 	} else {
 		group := ws_select_group(ws, selection)
-		cellsContain: bool = false
+		action.logic = .user_add
 		for cell in group^ do if c, ok := cell^.(CellPossibilities); ok {
-			cellsContain = cellsContain || pos in c
+			if poss in c {
+				action.logic = .user_remove
+				break
+			}
 		}
-
-		if cellsContain {
-			action.logic = .user_remove
-		} else {
-			action.logic = .user_add
-		}
-
-		for c, i in group^ {
-			set_action_on_cell(c, sel_get_coords_from_index(selection, i), pos, &action)
-		}
+		set_action_on_group(group, poss, &action, selection)
 	}
-
 	ws_take_action(ws, &action)
 }
 
-set_action_on_cell :: proc(cell: ^Cell, coords: CellCoords, poss: int, action: ^SudokuAction) {
+set_action_on_group :: proc(
+	group: ^CellGroup,
+	#any_int poss: int,
+	action: ^SudokuAction,
+	selection: ^Selection,
+) {
+	for c, i in group^ {
+		set_action_on_cell(c, sel_get_coords_from_index(selection, i), poss, action)
+	}
+}
+
+set_action_on_cell :: proc(
+	cell: ^Cell,
+	coords: CellCoords,
+	#any_int poss: int,
+	action: ^SudokuAction,
+) {
 	if action.logic == {} do switch c in cell^ {
 	case CellPossibilities:
 		if poss in c {
-			if card(c) > 2 {
+			if card(c) > 1 {
 				action.logic = .user_remove
 			} else {
 				return

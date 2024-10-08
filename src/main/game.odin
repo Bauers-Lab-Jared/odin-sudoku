@@ -18,7 +18,7 @@ GameState :: struct {
 }
 
 UserAction :: struct {
-	value:  Cell,
+	value:  u8,
 	action: UserActions,
 }
 
@@ -27,6 +27,8 @@ UserActions :: enum {
 	Action_MenuBtn,
 	Action_MouseBtn,
 	Action_Toggle,
+	Action_Add,
+	Action_Remove,
 }
 
 game_init :: proc(gameState: ^GameState) {
@@ -44,9 +46,22 @@ run_game_loop :: proc(using gameState: ^GameState) {
 		if uiState.menuState.mouseOverBtn != {} {
 			btn_on_click(gameState, uiState.menuState.mouseOverBtn)
 		}
+	case .Action_Add:
+		sel_set_possible(
+			&gameState.uiState.sudokuSel,
+			userAction.value,
+			&gameState.workspace,
+			true,
+		)
+	case .Action_Remove:
+		sel_set_possible(
+			&gameState.uiState.sudokuSel,
+			userAction.value,
+			&gameState.workspace,
+			false,
+		)
 	case .Action_Toggle:
-	//request sudoku action for user_add or user_remove
-	//then commit that action to the puzzle in the workspace
+		sel_toggle_possible(&gameState.uiState.sudokuSel, userAction.value, &gameState.workspace)
 	}
 
 	switch {

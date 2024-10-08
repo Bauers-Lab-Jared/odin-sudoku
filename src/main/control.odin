@@ -25,13 +25,11 @@ UIState :: struct {
 init_ui :: proc(gameState: ^GameState, allocator := context.allocator) {
 	using gameState.uiState
 	init_menu(gameState, allocator)
-
 	sudokuSel.group = .None
 	sudokuSel.coords = { 	// 9 is used for no selection
 		row = 9,
 		col = 9,
 	}
-
 }
 
 @(private)
@@ -58,6 +56,11 @@ GameControls :: enum {
 	NINE,
 	ACCEPT,
 	BACK,
+}
+
+@(private)
+Modifiers :: enum {
+	MOD_ADD,
 }
 
 @(private)
@@ -94,6 +97,11 @@ controlMap := map[rl.KeyboardKey]GameControls {
 	.KP_9      = .NINE,
 }
 
+@(private)
+modMap := map[Modifiers]rl.KeyboardKey {
+	.MOD_ADD = .LEFT_SHIFT,
+}
+
 game_handle_input :: proc(using uiState: ^UIState) -> (req: UserAction) {
 	if rl.IsMouseButtonPressed(.LEFT) {
 		req = UserAction {
@@ -128,7 +136,7 @@ game_handle_input :: proc(using uiState: ^UIState) -> (req: UserAction) {
 			case .ZERO:
 				n = 0
 			}
-			req = control_number_handler(n, uiState)
+			req = control_number_handler(n, uiState, rl.IsKeyDown(modMap[.MOD_ADD]))
 		case .LEFT, .RIGHT, .UP, .DOWN:
 			control_direction_handler(gameControl, uiState)
 		case .ACCEPT:
@@ -171,7 +179,13 @@ control_back_handler :: proc(using uiState: ^UIState) {
 	}
 }
 
-control_number_handler :: proc(#any_int num: u8, using uiState: ^UIState) -> (req: UserAction) {
+control_number_handler :: proc(
+	#any_int num: u8,
+	using uiState: ^UIState,
+	add: bool = false,
+) -> (
+	req: UserAction,
+) {
 	switch inputMode {
 	case .normal:
 		selection_goto(num, uiState)
@@ -183,8 +197,8 @@ control_number_handler :: proc(#any_int num: u8, using uiState: ^UIState) -> (re
 		inputMode = .normal
 	case .modify:
 		req = UserAction {
-			action = .Action_Toggle,
-			value  = (u16(num)),
+			action = .Action_Add if add else .Action_Remove,
+			value  = num,
 		}
 	case:
 	}
