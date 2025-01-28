@@ -15,7 +15,6 @@ tasks:
       - git add --all
   run:
     deps:
-      - build
       - git-gud
     cmds:
       - nix run . --show-trace
