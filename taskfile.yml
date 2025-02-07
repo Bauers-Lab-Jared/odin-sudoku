@@ -43,8 +43,8 @@ tasks:
       - git-gud
       - mkdir-debug
     cmds:
-      - odin test src/main/ -out:debug/main -o:none -all-packages
-      #- nix run . --show-trace
+      #- odin test src/main/ -out:debug/main -o:none -all-packages
+      - nix run . --show-trace
     aliases:
       - test
     method: none

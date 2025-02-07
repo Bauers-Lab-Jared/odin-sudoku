@@ -34,20 +34,18 @@ stdenv.mkDerivation rec {
   ];
 
   buildPhase = ''
-        runHook preBuild
+    runHook preBuild
 
-        mkdir -p $out/bin
+    mkdir -p $out/bin
 
-        odin build $src -out:$out/bin/$pname \
-        ${odin-libs.mkBuildArgs odinLibNames} \
-        -build-mode:exe \
-    #    -vet \
-    #    -disallow-do \
-        -warnings-as-errors \
-        -use-separate-modules \
-        -define:RAYLIB_SYSTEM=true
+    odin build $src -out:$out/bin/$pname \
+    ${odin-libs.mkBuildArgs odinLibNames} \
+    -build-mode:exe \
+    -warnings-as-errors \
+    -use-separate-modules \
+    -define:RAYLIB_SYSTEM=true
 
-        runHook postBuild
+    runHook postBuild
   '';
 
   installPhase = ''
