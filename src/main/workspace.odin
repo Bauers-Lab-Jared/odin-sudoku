@@ -1,8 +1,8 @@
 package SudokuSolver
 
-import "WaffleLib"
 import "base:runtime"
 import "core:fmt"
+import waffle "waffle:lib"
 
 Puzzle :: [9][9]Cell
 
@@ -51,7 +51,7 @@ ws_validate_action :: proc(ws: ^Workspace, action: ^SudokuAction) -> (ok: bool) 
 
 ws_take_action :: proc(ws: ^Workspace, action: ^SudokuAction) -> (err: runtime.Allocator_Error) {
 	if ws_validate_action(ws, action) {
-		WaffleLib.append_doubling(ws.log, action^) or_return
+		waffle.append_doubling(ws.log, action^) or_return
 		fmt.printfln("Action!!!")
 		fmt.printfln("%v", action.logic)
 		for change, i in action.changed do fmt.printfln("change %v: %v", i, change)

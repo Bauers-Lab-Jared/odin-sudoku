@@ -1,11 +1,11 @@
 package SudokuSolver
 
-import "WaffleLib"
 import "core:fmt"
 import "core:math"
 import "core:strconv"
 import "core:strings"
 import rl "vendor:raylib"
+import waffle "waffle:lib"
 
 UI_SIDE_BAR_WIDTH :: 3 * SUDOKU_CELL_SIZE
 UI_SIDE_BAR_SLIDEOUT :: UI_SIDE_BAR_WIDTH + SUDOKU_CELL_PAD_OUTER
@@ -113,7 +113,7 @@ draw_ui_menu_button :: proc(
 ) {
 	color: rl.Color
 	if m := (rl.GetMousePosition() - windowData.camera.offset) / windowData.camera.zoom;
-	   WaffleLib.is_inside_rectangle(m, anchor, anchor + size) {
+	   waffle.is_inside_rectangle(m, anchor, anchor + size) {
 		color = COLORS_GREEN
 		gameState.uiState.menuState.mouseOverBtn = butt
 	} else if index == gameState.uiState.menuState.current.selected {

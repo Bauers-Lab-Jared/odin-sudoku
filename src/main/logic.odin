@@ -1,8 +1,8 @@
 package SudokuSolver
 
-import "WaffleLib"
 import "base:runtime"
 import "core:fmt"
+import waffle "waffle:lib"
 
 sel_set_possible :: proc(
 	selection: ^Selection,

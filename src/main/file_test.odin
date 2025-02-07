@@ -1,9 +1,9 @@
 package SudokuSolver
 
-import "WaffleLib"
 import "core:fmt"
 import "core:strings"
 import "core:testing"
+import waffle "waffle:lib"
 
 @(test)
 test_read_sudoku_file :: proc(t: ^testing.T) {
