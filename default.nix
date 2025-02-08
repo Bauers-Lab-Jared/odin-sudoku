@@ -42,7 +42,7 @@ stdenv.mkDerivation {
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/Resources
+    mkdir -p $out/resources
     cp -r $src/resources/ $out
 
     runHook postInstall

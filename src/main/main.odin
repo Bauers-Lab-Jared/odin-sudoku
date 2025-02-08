@@ -8,7 +8,7 @@ import rl "vendor:raylib"
 
 main :: proc() {
 	call_path := filepath.dir(os.args[0])
-	resources_path := filepath.join([]string{call_path, "../Resources"})
+	resources_path := filepath.join([]string{call_path, "../resources"})
 
 	printBuilder := strings.builder_make(0, 8192)
 	defer strings.builder_destroy(&printBuilder)
