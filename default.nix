@@ -9,7 +9,7 @@
   raylib,
   odin-libs,
 }:
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "odin-sudoku";
   version = "0.1";
   src = ./src/main;
@@ -21,12 +21,9 @@ stdenv.mkDerivation rec {
       odin
       qqwing
     ]
-    ++ (odin-libs.getLibsByName odinLibNames);
+    ++ odin-libs.pkgs;
 
-  odinLibNames = [
-    "waffle"
-  ];
-
+  # Inputs to be available at runtime
   buildInputs = [
     libX11
     libGL
@@ -37,13 +34,7 @@ stdenv.mkDerivation rec {
     runHook preBuild
 
     mkdir -p $out/bin
-
-    odin build $src -out:$out/bin/$pname \
-    ${odin-libs.mkBuildArgs odinLibNames} \
-    -build-mode:exe \
-    -warnings-as-errors \
-    -use-separate-modules \
-    -define:RAYLIB_SYSTEM=true
+    ${odin-libs.odinCMD "build"}
 
     runHook postBuild
   '';

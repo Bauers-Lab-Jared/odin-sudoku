@@ -18,7 +18,6 @@ tasks:
       - git-gud
     cmds:
       - nix run . --show-trace
-    method: none
   debug:
     deps:
       - build-debug
@@ -26,11 +25,9 @@ tasks:
       - gdb debug/main --tui
     aliases:
       - d
-    method: none
   debug-dap:
     cmds:
       - gdb debug/main -i dap
-    method: none
   build:
     deps:
       - git-gud
@@ -43,28 +40,25 @@ tasks:
       - git-gud
       - mkdir-debug
     cmds:
-      #- odin test src/main/ -out:debug/main -o:none -all-packages
-      - nix run . --show-trace
+      - eval "$TEST_CMD"
     aliases:
       - test
-    method: none
+    env:
+      src: ./src/main/
   mkdir-debug:
-    sources:
-      - "debug/"
     cmds:
-      - mkdir -p debug
+      - rm -r debug || true
+      - mkdir debug
     internal: true
   build-debug:
     deps:
       - mkdir-debug
-    sources:
-      - "src/**/*.odin"
     cmds:
-      - odin build src/main -out:debug/main -o:none -debug
+      - eval "$DEBUG_CMD"
     aliases:
       - bd
-    generates:
-      - debug/main
+    env:
+      src: ./src/main/
   watch:
     watch: true
     sources:
