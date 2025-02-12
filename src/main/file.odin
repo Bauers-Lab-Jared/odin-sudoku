@@ -4,7 +4,7 @@ import "base:runtime"
 import "core:fmt"
 import "core:os"
 import "core:strings"
-import waffle "waffle:lib"
+import waffle "lib:waffle"
 
 SudokuRead_Error :: union {
 	os.Errno,

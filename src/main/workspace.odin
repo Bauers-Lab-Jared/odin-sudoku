@@ -2,7 +2,7 @@ package SudokuSolver
 
 import "base:runtime"
 import "core:fmt"
-import waffle "waffle:lib"
+import waffle "lib:waffle"
 
 Puzzle :: [9][9]Cell
 

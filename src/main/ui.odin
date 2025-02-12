@@ -4,8 +4,8 @@ import "core:fmt"
 import "core:math"
 import "core:strconv"
 import "core:strings"
+import waffle "lib:waffle"
 import rl "vendor:raylib"
-import waffle "waffle:lib"
 
 UI_SIDE_BAR_WIDTH :: 3 * SUDOKU_CELL_SIZE
 UI_SIDE_BAR_SLIDEOUT :: UI_SIDE_BAR_WIDTH + SUDOKU_CELL_PAD_OUTER

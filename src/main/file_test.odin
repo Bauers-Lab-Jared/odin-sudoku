@@ -3,7 +3,7 @@ package SudokuSolver
 import "core:fmt"
 import "core:strings"
 import "core:testing"
-import waffle "waffle:lib"
+import waffle "lib:waffle"
 
 @(test)
 test_read_sudoku_file :: proc(t: ^testing.T) {
